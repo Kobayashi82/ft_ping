@@ -1,0 +1,13 @@
+*
+!.vscode
+!.vscode/**
+!doc
+!doc/**
+doc/subject.pdf
+!inc
+!inc/**
+!src
+!src/**
+!Makefile
+!.gitignore
+!README.md
