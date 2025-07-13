@@ -1,9 +1,11 @@
 *
 !.vscode
 !.vscode/**
+.vscode/launch.json
+.vscode/settings.json
 !doc
 !doc/**
-doc/subject.pdf
+doc/ft_ping\ 5.1.pdf
 !inc
 !inc/**
 !src
@@ -11,3 +13,4 @@ doc/subject.pdf
 !Makefile
 !.gitignore
 !README.md
+!LICENSE
