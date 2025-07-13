@@ -6,11 +6,20 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/13 16:31:46 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/13 22:39:53 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int main() {
+
+#include "options.h"
+#include <stdio.h>
+
+int main(int argc, char **argv) {
+	t_options options;
+	memset(&options, 0, sizeof(t_options));
+	parse_options(&options, argc, argv);
+
+	printf("Prueba: %d\n", options.count);
 	return (0);
 }
 

@@ -5,93 +5,117 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/17 17:28:26 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/13 18:10:45 by vzurera-         ###   ########.fr       */
+/*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/07/13 22:39:32 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "options.h"
-	#include <string.h>
 
 #pragma endregion
 
 #pragma region "Parse"
 
-	int long_option(t_opt *opt, int argc, char **argv, int i) {
-		if (!argv[i]) return (i);
+	void parse_options(t_options *options, int argc, char **argv) {
+		int opt;
 
-		if (!strcmp(argv[i], "--"))					return ("--");
-		if (!strcmp(argv[i], "--address"))			return ("-A");
-		if (!strcmp(argv[i], "--echo"))				return ("-E");
-		if (!strcmp(argv[i], "--mask"))				return ("-K");
-		if (!strcmp(argv[i], "--timestamp"))		return ("-M");
-		if (!strcmp(argv[i], "--type="))			return ("-t");
-		if (!strcmp(argv[i], "--count="))			return ("-c");
-		if (!strcmp(argv[i], "--debug"))			return ("-d");
-		if (!strcmp(argv[i], "--interval="))		return ("-i");
-		if (!strcmp(argv[i], "--numeric"))			return ("-n");
-		if (!strcmp(argv[i], "--ignore-routing"))	return ("-r");
-		if (!strcmp(argv[i], "--ttl="))				return ("-L");
-		if (!strcmp(argv[i], "--tos="))				return ("-T");
-		if (!strcmp(argv[i], "--verbose"))			return ("-v");
-		if (!strcmp(argv[i], "--timeout="))			return ("-w");
-		if (!strcmp(argv[i], "--linger="))			return ("-W");
-		if (!strcmp(argv[i], "--flood"))			return ("-f");
-		if (!strcmp(argv[i], "--ip-timestamp="))	return ("-I");
-		if (!strcmp(argv[i], "--preload="))			return ("-l");
-		if (!strcmp(argv[i], "--pattern="))			return ("-p");
-		if (!strcmp(argv[i], "--quiet"))			return ("-q");
-		if (!strcmp(argv[i], "--route"))			return ("-R");
-		if (!strcmp(argv[i], "--size="))			return ("-s");
-		if (!strcmp(argv[i], "--help"))				return ("-h");
-		if (!strcmp(argv[i], "--usage"))			return ("-U");
-		if (!strcmp(argv[i], "--version"))			return ("-V");
+		struct option long_options[] = {
+			// ICMP request types
+			{"address", no_argument, 0, 0},				// [	--address]
+			{"echo", no_argument, 0, 0},				// [	--echo]
+			{"mask", no_argument, 0, 0},				// [	--mask]
+			{"timestamp", no_argument, 0, 0},			// [	--timestamp]
+			{"type", required_argument, 0, 't'},		// [-t, --type=TYPE]
+			// All request
+			{"count", required_argument, 0, 'c'},		// [-c, --count=NUMBER]
+			{"debug", no_argument, 0, 'd'},				// [-d, --debug]	
+			{"interval", required_argument, 0, 'i'},	// [-i, --interval=NUMBER]
+			{"numeric", no_argument, 0, 'n'},			// [-n, --numeric]	
+			{"ignore-routing", no_argument, 0, 'r'},	// [-r, --ignore-routing]
+			{"ttl", required_argument, 0, 0},			// [	--ttl=N]	
+			{"tos", required_argument, 0, 'T'},			// [-T, --tos=NUM]
+			{"verbose", no_argument, 0, 'v'},			// [-v, --verbose]
+			{"timeout", required_argument, 0, 'w'},		// [-w, --timeout=N]
+			{"linger", required_argument, 0, 'W'},		// [-W, --linger=N]
+			// Echo requests
+			{"flood", no_argument, 0, 'f'},				// [-f, --count=NUMBER]
+			{"ip-timestamp", required_argument, 0, 0},	// [	--ip-timestamp=FLAG]
+			{"preload", required_argument, 0, 'l'},		// [-l, --preload=NUMBER]
+			{"pattern", required_argument, 0, 'p'},		// [-p, --pattern=PATTERN]
+			{"quiet", no_argument, 0, 'q'},				// [-q, --quiet]
+			{"route", no_argument, 0, 'R'},				// [-R, --route]
+			{"size", required_argument, 0, 's'},		// [-s, --size=NUMBER]
+			// Info
+			{"help", no_argument, 0, 'h'},				// [-h?, --help]
+			{"usage", no_argument, 0, 0},				// [	--usage]
+			{"version", no_argument, 0, 'V'},			// [-V, --version]
+			{0, 0, 0, 0}
+		};
 
-		return (i);
-	}
-
-	void parse_options(t_opt *opt, int argc, char **argv) {
-		if (!opt || argc < 2 || !argv) return ;
-
-		static char options[] = "AEKMtcdinrLTvwWfIlpqRsh?UV";
-
-		int index = 0;
-		int valid_index = 0, invalid_index = 0, done = 0;
-
-		for (int i = 1; i < argc; ++i) {
-			if		(argv[i] && !strncmp(argv[i], "--", 2)) i = long_option(opt, argc, argv, i);
-			else if	(argv[i] && !strncmp(argv[i], "-", 1)) {
-
+		while ((opt = getopt_long(argc, argv, "t:c:di:nrT:vw:W:fl:p:qRs:h?V", long_options, NULL)) != -1) {
+			switch (opt) {
+				case 't':
+					options->type = atoi(optarg);		break;
+				case 'c':
+					options->count = atoi(optarg);		break;
+				case 'd':
+					options->debug = true;				break;
+				case 'i':
+					options->interval = atoi(optarg);	break;
+				case 'n':
+					options->numeric = true;			break;
+				case 'r':
+					options->ignore_routing = true;		break;
+				case 'T':
+					options->tos = atoi(optarg);		break;
+				case 'v':
+					options->verbose = true;			break;
+				case 'w':
+					options->timeout = atoi(optarg);	break;
+				case 'W':
+					options->linger = atoi(optarg);		break;
+				case 'f':
+					options->flood = true;				break;
+				case 'l':
+					options->preload = atoi(optarg);	break;
+				case 'p':
+					memcpy(options->pattern, optarg, strlen(optarg) + 1);	break;
+				case 'q':
+					options->quiet = true;				break;
+				case 'R':
+					options->route = true;				break;
+				case 's':
+					options->size = atoi(optarg);		break;
+				case 'V':
+					options->version = true;			break;
+				case '?':
+				case 'h':
+					options->help = true;				break;
+				case 0:
+					if (!strcmp(long_options[optind -1].name, "address"))
+						options->address = true;
+					else if (!strcmp(long_options[optind -1].name, "echo"))
+						options->echo = true;
+					else if (!strcmp(long_options[optind -1].name, "mask"))
+						options->mask = true;
+					else if (!strcmp(long_options[optind -1].name, "timestamp"))
+						options->timestamp = true;
+					else if (!strcmp(long_options[optind -1].name, "ttl"))
+						options->ttl = atoi(optarg);
+					else if (!strcmp(long_options[optind -1].name, "usage"))
+						options->usage = true;
+					else if (!strcmp(long_options[optind -1].name, "ip-timestamp"))
+						options->ip_timestamp = true;
+					break;
+				default:
+					// printf("Unknown option: %c\n", opt);
+					break;
 			}
 		}
 
-		while (argv && argv[index] && argv[index][0] == '-' && !done) {
-			if (valid_index >= MAX_OPTIONS - 1 || invalid_index >= MAX_OPTIONS - 1) { opt->too_many = true; break; }
-
-			char *arg = argv[index];
-			if (!strcmp(arg, "--")) { index++; break; } // check ip if no ip, else, ignore the rest
-
-			else if (!strcmp(arg, "--help"))	{ if (!strchr(opt->valid, '?')) opt->valid[valid_index++] = '?'; }
-			else if (!strcmp(arg, "--version"))	{ if (!strchr(opt->valid, '#')) opt->valid[valid_index++] = '#'; }
-
-			else {
-				for (int i = 1; arg[i]; ++i) {
-					if (valid_index >= MAX_OPTIONS - 1 || invalid_index >= MAX_OPTIONS - 1)	{ opt->too_many = true; break; }
-					if (strchr(options, arg[i])) {
-						if (!strchr(opt->valid, arg[i])) opt->valid[valid_index++] = arg[i];
-					} else {
-						if (!strchr(opt->invalid, arg[i])) opt->invalid[invalid_index++] = arg[i];
-					} 
-				}
-			} if (!done && !opt->too_many) index++; // ??
-		}
-
-		opt->valid[valid_index] = '\0';
-		opt->invalid[invalid_index] = '\0';
-
-		return (opt);
+		if (optind < argc) strcpy(options->target, argv[optind]);
 	}
 
 #pragma endregion
