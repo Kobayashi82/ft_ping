@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/13 22:31:19 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/14 13:52:12 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,20 @@
 	#include <stdbool.h>
 	#include <string.h>
 	#include <stdlib.h>
+	#include <stdio.h>
+
+#pragma endregion
+
+#pragma region "Enumerators"
+
+	enum e_type { ADDRESS = 1000, ECHO = 1001, MASK = 1002, TIMESTAMP = 1003 };
 
 #pragma endregion
 
 #pragma region "Structures"
 
 	typedef struct s_options {
-		// ICMP request types
-		bool			address;				// [	--address]				send ICMP_ADDRESS packets (root only)
-		bool			echo;					// [	--echo]					send ICMP_ECHO packets (default)
-		bool			mask;					// [	--mask]					same as --address
-		bool			timestamp;				// [	--timestamp]			send ICMP_TIMESTAMP packets
-		int				type;					// [-t, --type=TYPE]			send TYPE packets
+		int				type;					// ADDRESS, ECHO, MASK, TIMESTAMP
 		// All request
 		int				count;					// [-c, --count=NUMBER]			stop after sending NUMBER packets
 		bool			debug;					// [-d, --debug]				set the SO_DEBUG option
@@ -49,10 +51,6 @@
 		bool			quiet;					// [-q, --quiet]				quiet output
 		bool			route;					// [-R, --route]				record route
 		int				size;					// [-s, --size=NUMBER]			send NUMBER data octets
-		// Info
-		bool			help;					// [-h?, --help]				give this help list
-		bool			usage;					// [	--usage]				give a short usage message
-		bool			version;				// [-V, --version]				print program version
 		// Target
 		char			target[254];			// IP address or hostname
 	}	t_options;
@@ -74,6 +72,6 @@
 
 #pragma region "Methods"
 
-	void parse_options(t_options *options, int argc, char **argv);
+	int parse_options(t_options *options, int argc, char **argv);
 
 #pragma endregion

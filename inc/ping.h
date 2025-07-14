@@ -1,30 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ping.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/14 14:06:39 by vzurera-         ###   ########.fr       */
+/*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/07/14 14:05:42 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
+
 #pragma region "Includes"
 
-	#include "ping.h"
+	#include "options.h"
 
 #pragma endregion
 
-#pragma region "Main"
+#pragma region "Enumerators"
 
-	int main(int argc, char **argv) {
-		t_options options;
 
-		int result = parse_options(&options, argc, argv);
-		if (result) return (result - 1);
 
-		return (result);
-	}
+#pragma endregion
+
+#pragma region "Structures"
+
+
+
+#pragma endregion
+
+#pragma region "Variables"
+
+
+
+#pragma endregion
+
+#pragma region "Methods"
+
+
 
 #pragma endregion
