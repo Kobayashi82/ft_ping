@@ -6,11 +6,12 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/14 14:02:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/16 23:56:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-// TODO: Validate input
+// TODO:	Validate input
+// BONUS:	-f -l -n -w -W -p -r -s -T --ttl --ip-timestamp flags...
 
 #pragma region "Includes"
 
@@ -109,7 +110,6 @@
 
 	static int invalid() {
 		dprintf(2, "Try 'ft_ping --help' or 'ft_ping --usage' for more information.\n");
-
 		return (2);
 	}
 
@@ -119,69 +119,80 @@
 
 	int parse_options(t_options *options, int argc, char **argv) {
 		memset(options, 0, sizeof(t_options));
-
 		struct option long_options[] = {
 			// ICMP request types
-			{"address", no_argument, 0, 'A'},				// [	--address]
-			{"echo", no_argument, 0, 'E'},					// [	--echo]
-			{"mask", no_argument, 0, 'K'},					// [	--mask]
-			{"timestamp", no_argument, 0, 'M'},				// [	--timestamp]
-			{"type", required_argument, 0, 't'},			// [-t, --type=TYPE]
+			{"address",			no_argument,		0, 'A'},	// [	--address]
+			{"echo",			no_argument,		0, 'E'},	// [	--echo]
+			{"mask",			no_argument,		0, 'K'},	// [	--mask]
+			{"timestamp",		no_argument,		0, 'M'},	// [	--timestamp]
+			{"type",			required_argument,	0, 't'},	// [-t, --type=TYPE]
 			// All request
-			{"count", required_argument, 0, 'c'},			// [-c, --count=NUMBER]
-			{"debug", no_argument, 0, 'd'},					// [-d, --debug]	
-			{"interval", required_argument, 0, 'i'},		// [-i, --interval=NUMBER]
-			{"numeric", no_argument, 0, 'n'},				// [-n, --numeric]	
-			{"ignore-routing", no_argument, 0, 'r'},		// [-r, --ignore-routing]
-			{"ttl", required_argument, 0, 'L'},				// [	--ttl=N]	
-			{"tos", required_argument, 0, 'T'},				// [-T, --tos=NUM]
-			{"verbose", no_argument, 0, 'v'},				// [-v, --verbose]
-			{"timeout", required_argument, 0, 'w'},			// [-w, --timeout=N]
-			{"linger", required_argument, 0, 'W'},			// [-W, --linger=N]
+			{"count",			required_argument,	0, 'c'},	// [-c, --count=NUMBER]
+			{"debug",			no_argument,		0, 'd'},	// [-d, --debug]	
+			{"interval",		required_argument,	0, 'i'},	// [-i, --interval=NUMBER]
+			{"numeric",			no_argument,		0, 'n'},	// [-n, --numeric]	
+			{"ignore-routing",	no_argument,		0, 'r'},	// [-r, --ignore-routing]
+			{"ttl",				required_argument,	0, 'L'},	// [	--ttl=N]	
+			{"tos",				required_argument,	0, 'T'},	// [-T, --tos=NUM]
+			{"verbose",			no_argument,		0, 'v'},	// [-v, --verbose]
+			{"timeout",			required_argument,	0, 'w'},	// [-w, --timeout=N]
+			{"linger",			required_argument,	0, 'W'},	// [-W, --linger=N]
 			// Echo requests
-			{"flood", no_argument, 0, 'f'},					// [-f, --count=NUMBER]
-			{"ip-timestamp", required_argument, 0, 'I'},	// [	--ip-timestamp=FLAG]
-			{"preload", required_argument, 0, 'l'},			// [-l, --preload=NUMBER]
-			{"pattern", required_argument, 0, 'p'},			// [-p, --pattern=PATTERN]
-			{"quiet", no_argument, 0, 'q'},					// [-q, --quiet]
-			{"route", no_argument, 0, 'R'},					// [-R, --route]
-			{"size", required_argument, 0, 's'},			// [-s, --size=NUMBER]
+			{"flood",			no_argument,		0, 'f'},	// [-f, --count=NUMBER]
+			{"ip-timestamp",	required_argument,	0, 'I'},	// [	--ip-timestamp=FLAG]
+			{"preload",			required_argument,	0, 'l'},	// [-l, --preload=NUMBER]
+			{"pattern",			required_argument,	0, 'p'},	// [-p, --pattern=PATTERN]
+			{"quiet",			no_argument,		0, 'q'},	// [-q, --quiet]
+			{"route",			no_argument,		0, 'R'},	// [-R, --route]
+			{"size",			required_argument,	0, 's'},	// [-s, --size=NUMBER]
 			// Info
-			{"help", no_argument, 0, 'h'},					// [-h?, --help]
-			{"usage", no_argument, 0, 'U'},					// [	--usage]
-			{"version", no_argument, 0, 'V'},				// [-V, --version]
+			{"help",			no_argument,		0, 'h'},	// [-h?, --help]
+			{"usage",			no_argument,		0, 'U'},	// [	--usage]
+			{"version",			no_argument,		0, 'V'},	// [-V, --version]
 			{0, 0, 0, 0}
 		};
 
 		int opt;
 		while ((opt = getopt_long(argc, argv, "t:c:di:nrT:vw:W:fl:p:qRs:h?V", long_options, NULL)) != -1) {
 			switch (opt) {
-				case 't':	options->type = atoi(optarg);							break;
-				case 'c':	options->count = atoi(optarg);							break;
-				case 'd':	options->debug = true;									break;
-				case 'i':	options->interval = atoi(optarg);						break;
-				case 'n':	options->numeric = true;								break;
-				case 'r':	options->ignore_routing = true;							break;
-				case 'T':	options->tos = atoi(optarg);							break;
-				case 'v':	options->verbose = true;								break;
-				case 'w':	options->timeout = atoi(optarg);						break;
-				case 'W':	options->linger = atoi(optarg);							break;
-				case 'f':	options->flood = true;									break;
-				case 'l':	options->preload = atoi(optarg);						break;
-				case 'p':	memcpy(options->pattern, optarg, strlen(optarg) + 1);	break;
-				case 'q':	options->quiet = true;									break;
-				case 'R':	options->route = true;									break;
-				case 's':	options->size = atoi(optarg);							break;
-				case 'V':	return (version());
-				case '?':	if (!strcmp(argv[optind - 1], "-?")) return (help()); else return (invalid());
-				case 'h':	return (help());
-				case 'A' :	options->type = ADDRESS;								break;
-				case 'E' :	options->type = ECHO;									break;
-				case 'K' :	options->type = MASK;									break;
-				case 'M' :	options->type = TIMESTAMP;								break;
-				case 'L' :	options->ttl = atoi(optarg);							break;
-				case 'I' : 	options->ip_timestamp = atoi(optarg);					break;
-				case 'U' :	return (usage());
+				case 't': {
+					if		(!ft_lstrcmp(optarg, "address"))	options->type = ADDRESS;
+					else if	(!ft_lstrcmp(optarg, "echo"))		options->type = ECHO;
+					else if	(!ft_lstrcmp(optarg, "mask"))		options->type = MASK;
+					else if	(!ft_lstrcmp(optarg, "timestamp"))	options->type = TIMESTAMP;
+					else { dprintf(2, "ft_ping: unsupported packet type: %s\n", optarg);	return (2); }
+					break;
+				}
+				case 'A' :	options->type = ADDRESS;															break;
+				case 'E' :	options->type = ECHO;																break;
+				case 'K' :	options->type = MASK;																break;
+				case 'M' :	options->type = TIMESTAMP;															break;
+				case 'c':	if (ft_strtoul(optarg, &options->count))						return (2);			break;
+				case 'i':	if (ft_strtoul(optarg, &options->interval))						return (2);			break;
+				case 'L' :	if (ft_strtoul(optarg, &options->ttl))							return (2);			break;
+				case 'T':	if (ft_strtoul(optarg, &options->tos))							return (2);			break;
+				case 'w':	if (ft_strtoul(optarg, &options->timeout))						return (2);			break;
+				case 'W':	if (ft_strtoul(optarg, &options->linger))						return (2);			break;
+				case 'l':	if (ft_strtoul(optarg, &options->preload))						return (2);			break;
+				case 's':	if (ft_strtoul(optarg, &options->size))							return (2);			break;
+				case 'I' : {
+					if		(!ft_lstrcmp(optarg, "tsonly"))		options->type = TSONLY;
+					else if	(!ft_lstrcmp(optarg, "tsaddr"))		options->type = TSADDR;
+					else { dprintf(2, "ft_ping: unsupported timestamp type: %s\n", optarg); return (2); }
+					break;
+				}
+				case 'p':	memcpy(options->pattern, optarg, strlen(optarg) + 1);								break;
+				case 'd':	options->debug = true;																break;
+				case 'n':	options->numeric = true;															break;
+				case 'r':	options->ignore_routing = true;														break;
+				case 'v':	options->verbose = true;															break;
+				case 'f':	options->flood = true;																break;
+				case 'q':	options->quiet = true;																break;
+				case 'R':	options->route = true;																break;
+				case '?':	if (!strcmp(argv[optind - 1], "-?"))							return (help()); 	return (invalid());
+				case 'h':																	return (help());
+				case 'U' :																	return (usage());
+				case 'V':																	return (version());
 			}
 		}
 
@@ -189,7 +200,6 @@
 		else {
 			dprintf(2, "ft_ping: missing host operand\n");
 			dprintf(2, "Try 'ft_ping --help' or 'ft_ping --usage' for more information.\n");
-
 			return (2);
 		}
 
@@ -197,66 +207,5 @@
 
 		return (0);
 	}
-
-#pragma endregion
-
-#pragma region "Information"
-
-	// BONUS: -f -l -n -w -W -p -r -s -T --ttl --ip-timestamp flags...
-
-
-	// Usage: ping [OPTION...] HOST ...
-	// Send ICMP ECHO_REQUEST packets to network hosts.
-
-	//  Options controlling ICMP request types:
-	//       --address              send ICMP_ADDRESS packets (root only)
-	//       --echo                 send ICMP_ECHO packets (default)
-	//       --mask                 same as --address
-	//       --timestamp            send ICMP_TIMESTAMP packets
-	//   -t, --type=TYPE            send TYPE packets
-
-	//  Options valid for all request types:
-
-	//   -c, --count=NUMBER         stop after sending NUMBER packets
-	//   -d, --debug                set the SO_DEBUG option
-	//   -i, --interval=NUMBER      wait NUMBER seconds between sending each packet
-	//   -n, --numeric              do not resolve host addresses
-	//   -r, --ignore-routing       send directly to a host on an attached network
-	//       --ttl=N                specify N as time-to-live
-	//   -T, --tos=NUM              set type of service (TOS) to NUM
-	//   -v, --verbose              verbose output
-	//   -w, --timeout=N            stop after N seconds
-	//   -W, --linger=N             number of seconds to wait for response
-
-	//  Options valid for --echo requests:
-
-	//   -f, --flood                flood ping (root only)
-	//       --ip-timestamp=FLAG    IP timestamp of type FLAG, which is one of
-	//                              "tsonly" and "tsaddr"
-	//   -l, --preload=NUMBER       send NUMBER packets as fast as possible before
-	//                              falling into normal mode of behavior (root only)
-	//   -p, --pattern=PATTERN      fill ICMP packet with given pattern (hex)
-	//   -q, --quiet                quiet output
-	//   -R, --route                record route
-	//   -s, --size=NUMBER          send NUMBER data octets
-
-	//   -?, --help                 give this help list
-	//       --usage                give a short usage message
-	//   -V, --version              print program version
-
-	// Mandatory or optional arguments to long options are also mandatory or optional
-	// for any corresponding short options.
-
-	// Options marked with (root only) are available only to superuser.
-
-
-	// Usage: ping [-dnrvfqR?V] [-t TYPE] [-c NUMBER] [-i NUMBER] [-T NUM] [-w N]
-	//             [-W N] [-l NUMBER] [-p PATTERN] [-s NUMBER] [--address] [--echo]
-	//             [--mask] [--timestamp] [--type=TYPE] [--count=NUMBER] [--debug]
-	//             [--interval=NUMBER] [--numeric] [--ignore-routing] [--ttl=N]
-	//             [--tos=NUM] [--verbose] [--timeout=N] [--linger=N] [--flood]
-	//             [--ip-timestamp=FLAG] [--preload=NUMBER] [--pattern=PATTERN]
-	//             [--quiet] [--route] [--size=NUMBER] [--help] [--usage] [--version]
-	//             HOST ...
 
 #pragma endregion

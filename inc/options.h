@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/14 13:52:12 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/16 23:46:52 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,43 +14,46 @@
 
 #pragma region "Includes"
 
+	#include <utils.h>
+
 	#include <getopt.h>
 	#include <stdbool.h>
 	#include <string.h>
 	#include <stdlib.h>
 	#include <stdio.h>
+	#include <errno.h>
 
 #pragma endregion
 
 #pragma region "Enumerators"
 
-	enum e_type { ADDRESS = 1000, ECHO = 1001, MASK = 1002, TIMESTAMP = 1003 };
+	enum e_type { ECHO = 1000, ADDRESS = 1001, MASK = 1001, TIMESTAMP = 1002, TSONLY = 1003, TSADDR = 1004 };
 
 #pragma endregion
 
 #pragma region "Structures"
 
 	typedef struct s_options {
-		int				type;					// ADDRESS, ECHO, MASK, TIMESTAMP
+		unsigned long	type;					// ADDRESS, ECHO, MASK, TIMESTAMP
 		// All request
-		int				count;					// [-c, --count=NUMBER]			stop after sending NUMBER packets
+		unsigned long	count;					// [-c, --count=NUMBER]			stop after sending NUMBER packets
 		bool			debug;					// [-d, --debug]				set the SO_DEBUG option
-		int				interval;				// [-i, --interval=NUMBER]		wait NUMBER seconds between sending each packet
+		unsigned long	interval;				// [-i, --interval=NUMBER]		wait NUMBER seconds between sending each packet
 		bool			numeric;				// [-n, --numeric]				do not resolve host addresses
 		bool			ignore_routing;			// [-r, --ignore-routing]		send directly to a host on an attached network
-		int				ttl;					// [	--ttl=N]				specify N as time-to-live
-		int				tos;					// [-T, --tos=NUM]				set type of service (TOS) to NUM
+		unsigned long	ttl;					// [	--ttl=N]				specify N as time-to-live
+		unsigned long	tos;					// [-T, --tos=NUM]				set type of service (TOS) to NUM
 		bool			verbose;				// [-v, --verbose]				verbose output
-		int				timeout;				// [-w, --timeout=N]			stop after N seconds
-		int				linger;					// [-W, --linger=N]				number of seconds to wait for response
+		unsigned long	timeout;				// [-w, --timeout=N]			stop after N seconds
+		unsigned long	linger;					// [-W, --linger=N]				number of seconds to wait for response
 		// Echo requests
 		bool			flood;					// [-f, --count=NUMBER]			flood ping (root only)
-		int				ip_timestamp;			// [	--ip-timestamp=FLAG]	IP timestamp of type FLAG, which is one of "tsonly" and "tsaddr"
-		int				preload;				// [-l, --preload=NUMBER]		send NUMBER packets as fast as possible before falling into normal mode of behavior (root only)
+		unsigned long	ip_timestamp;			// [	--ip-timestamp=FLAG]	IP timestamp of type FLAG, which is one of "tsonly" and "tsaddr"
+		unsigned long	preload;				// [-l, --preload=NUMBER]		send NUMBER packets as fast as possible before falling into normal mode of behavior (root only)
 		unsigned char	pattern[65507];			// [-p, --pattern=PATTERN]		fill ICMP packet with given pattern (hex)
 		bool			quiet;					// [-q, --quiet]				quiet output
 		bool			route;					// [-R, --route]				record route
-		int				size;					// [-s, --size=NUMBER]			send NUMBER data octets
+		unsigned long	size;					// [-s, --size=NUMBER]			send NUMBER data octets
 		// Target
 		char			target[254];			// IP address or hostname
 	}	t_options;
