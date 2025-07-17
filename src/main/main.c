@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 14:04:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 21:33:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,12 @@
 #pragma region "Main"
 
 	int main(int argc, char **argv) {
-		t_options options;
-
-		int result = parse_options(&options, argc, argv);
+		int result = parse_options(&ping.options, argc, argv);
 		if (result) return (result - 1);
+		set_signals();
+		socket_create();
+		main_loop();
 
-		printf("%s\n", options.host);
 		return (result);
 	}
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 14:10:08 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 21:27:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@
 
 	#include <netdb.h>
 	#include <sys/socket.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
 
 #pragma endregion
 
@@ -55,25 +57,13 @@
 	#define MAX_ICMP_LEN	76
 	#define MAX_DATA_LEN	(65535 - MAX_IP_LEN - MAX_ICMP_LEN)
 
-	#define PING_PRECISION			1000							// Millisecond precision
+	#define PING_PRECISION			1000
 	#define PING_MIN_USER_INTERVAL	(200000 / PING_PRECISION)
-	#define PING_DEFAULT_INTERVAL	1000							// Milliseconds
-
-	// #define PING_SET_INTERVAL(t,i) do {\
-	// (t).tv_sec = (i)/PING_PRECISION;\
-	// (t).tv_usec = ((i)%PING_PRECISION)*(1000000/PING_PRECISION) ;\
-	// } while (0)
+	#define PING_DEFAULT_INTERVAL	1000
 
 #pragma endregion
 
 #pragma region "Structures"
-
-	typedef struct s_stats {
-		double tmin;								// minimum round trip time
-		double tmax;								// maximum round trip time
-		double tsum;								// sum of all times, for doing average
-		double tsumsq;								// sum of all times squared, for std. dev.
-	}	t_stats;
 
 	typedef struct s_options {
 		bool				is_root;				// 
@@ -95,7 +85,8 @@
 		unsigned char		pattern[MAX_PATTERN];	// [-p, --pattern=PATTERN]		fill ICMP packet with given pattern (hex)
 		int					pattern_len;			// 
 
-		char				host[254];				// IP address or hostname
+		char				hostname[254];			// IP address or hostname
+		char				host[INET_ADDRSTRLEN];	// IP address resolved
 		struct sockaddr_in	sockaddr;				// 
 	}	t_options;
 

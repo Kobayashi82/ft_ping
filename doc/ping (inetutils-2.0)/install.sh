@@ -31,6 +31,7 @@ make > /dev/null 2>&1
 
 cp ping/ping "$BIN/ping"
 chmod +x "$BIN/ping"
+# sudo setcap cap_net_raw+ep "$BIN/ping"
 
 "$BIN/ping" -V
 

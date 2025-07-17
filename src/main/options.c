@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 14:32:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 21:31:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 #pragma endregion
 
-#pragma region "FT_STRTOUL"
+#pragma region "Strtoul"
 
 	static int ft_strtoul(const char *optarg, size_t *value, size_t max_value, bool allow_zero) {
 		char *endptr;
@@ -129,7 +129,7 @@
 
 #pragma region "Validate Host"
 
-	int validate_host(t_options *options, const char *host) {
+	int validate_host(t_options *options, const char *hostname) {
 		struct addrinfo hints, *res;
 
 		memset(&hints, 0, sizeof(hints));
@@ -137,11 +137,12 @@
 		hints.ai_socktype = SOCK_RAW;
 		hints.ai_flags = AI_CANONNAME;
 
-		if (getaddrinfo(host, NULL, &hints, &res)) return (1);
+		if (getaddrinfo(hostname, NULL, &hints, &res)) return (1);
 
 		memcpy(&options->sockaddr, res->ai_addr, res->ai_addrlen);
-		strlcpy(options->host, res->ai_canonname ? res->ai_canonname : host, sizeof(options->host));
+		strlcpy(options->hostname, res->ai_canonname ? res->ai_canonname : hostname, sizeof(options->hostname));
 
+		inet_ntop(AF_INET, &options->sockaddr.sin_addr, options->host, INET_ADDRSTRLEN);
 		freeaddrinfo(res);
 
 		return (0);
@@ -152,7 +153,6 @@
 #pragma region "Parse"
 
 	int parse_options(t_options *options, int argc, char **argv) {
-		memset(options, 0, sizeof(t_options));
 		struct option long_options[] = {
 			// ICMP request types
 			{"address",			no_argument,		0, 'A'},	// [	--address]

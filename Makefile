@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/05 21:39:40 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/16 23:56:57 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/17 21:32:41 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -59,8 +59,8 @@ SRC_DIR		= src/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= main/main.c main/options.c				\
-			  utils/utils.c
+SRCS		= main/main.c main/options.c main/signal.c main/ping.c	\
+			  network/socket.c
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
