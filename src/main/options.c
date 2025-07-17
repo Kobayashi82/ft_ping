@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 14:01:45 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 14:32:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,7 @@
 		if (getaddrinfo(host, NULL, &hints, &res)) return (1);
 
 		memcpy(&options->sockaddr, res->ai_addr, res->ai_addrlen);
-		options->host = res->ai_canonname ? strdup(res->ai_canonname) : strdup(host);
+		strlcpy(options->host, res->ai_canonname ? res->ai_canonname : host, sizeof(options->host));
 
 		freeaddrinfo(res);
 

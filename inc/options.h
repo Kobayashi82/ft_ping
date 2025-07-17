@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 14:01:32 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 14:10:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,8 @@
 	#include <getopt.h>
 	#include <stdbool.h>
 
-	#include <sys/types.h>
-	#include <sys/socket.h>
 	#include <netdb.h>
-	#include <netinet/in.h>
-	#include <arpa/inet.h>
+	#include <sys/socket.h>
 
 #pragma endregion
 
@@ -98,7 +95,7 @@
 		unsigned char		pattern[MAX_PATTERN];	// [-p, --pattern=PATTERN]		fill ICMP packet with given pattern (hex)
 		int					pattern_len;			// 
 
-		char				*host;					// IP address or hostname
+		char				host[254];				// IP address or hostname
 		struct sockaddr_in	sockaddr;				// 
 	}	t_options;
 
