@@ -6,13 +6,15 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 13:27:46 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 14:01:32 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #pragma region "Includes"
+
+	#define _GNU_SOURCE
 
 	#include <stdio.h>
 	#include <stdlib.h>
@@ -21,7 +23,12 @@
 	#include <limits.h>
 	#include <getopt.h>
 	#include <stdbool.h>
+
+	#include <sys/types.h>
 	#include <sys/socket.h>
+	#include <netdb.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
 
 #pragma endregion
 
@@ -65,33 +72,34 @@
 #pragma region "Structures"
 
 	typedef struct s_stats {
-		double tmin;							// minimum round trip time
-		double tmax;							// maximum round trip time
-		double tsum;							// sum of all times, for doing average
-		double tsumsq;							// sum of all times squared, for std. dev.
+		double tmin;								// minimum round trip time
+		double tmax;								// maximum round trip time
+		double tsum;								// sum of all times, for doing average
+		double tsumsq;								// sum of all times squared, for std. dev.
 	}	t_stats;
 
 	typedef struct s_options {
-		bool			is_root;				// 
-		unsigned long	type;					// ADDRESS, ECHO, MASK, TIMESTAMP
-		unsigned long	options;				// NUMERIC, VERVOSE, FLOOD, QUIET, ROUTE
-		int				socket_type;			// DEBUG, IGNORE_ROUTING
+		bool				is_root;				// 
+		unsigned long		type;					// ADDRESS, ECHO, MASK, TIMESTAMP
+		unsigned long		options;				// NUMERIC, VERVOSE, FLOOD, QUIET, ROUTE
+		int					socket_type;			// DEBUG, IGNORE_ROUTING
 
-		size_t			count;					// [-c, --count=NUMBER]			stop after sending NUMBER packets
-		size_t			interval;				// [-i, --interval=NUMBER]		wait NUMBER seconds between sending each packet
-		size_t			ttl;					// [	--ttl=N]				specify N as time-to-live
-		size_t			tos;					// [-T, --tos=NUM]				set type of service (TOS) to NUM
-		size_t			timeout;				// [-w, --timeout=N]			stop after N seconds
-		size_t			linger;					// [-W, --linger=N]				number of seconds to wait for response
-		size_t			size;					// [-s, --size=NUMBER]			send NUMBER data octets
+		size_t				count;					// [-c, --count=NUMBER]			stop after sending NUMBER packets
+		size_t				interval;				// [-i, --interval=NUMBER]		wait NUMBER seconds between sending each packet
+		size_t				ttl;					// [	--ttl=N]				specify N as time-to-live
+		size_t				tos;					// [-T, --tos=NUM]				set type of service (TOS) to NUM
+		size_t				timeout;				// [-w, --timeout=N]			stop after N seconds
+		size_t				linger;					// [-W, --linger=N]				number of seconds to wait for response
+		size_t				size;					// [-s, --size=NUMBER]			send NUMBER data octets
 
-		unsigned long	ip_timestamp;			// [	--ip-timestamp=FLAG]	IP timestamp of type FLAG, which is one of "tsonly" and "tsaddr"
-		unsigned long	preload;				// [-l, --preload=NUMBER]		send NUMBER packets as fast as possible before falling into normal mode of behavior (root only)
+		unsigned long		ip_timestamp;			// [	--ip-timestamp=FLAG]	IP timestamp of type FLAG, which is one of "tsonly" and "tsaddr"
+		unsigned long		preload;				// [-l, --preload=NUMBER]		send NUMBER packets as fast as possible before falling into normal mode of behavior (root only)
 
-		unsigned char	pattern[MAX_PATTERN];	// [-p, --pattern=PATTERN]		fill ICMP packet with given pattern (hex)
-		int				pattern_len;			// 
+		unsigned char		pattern[MAX_PATTERN];	// [-p, --pattern=PATTERN]		fill ICMP packet with given pattern (hex)
+		int					pattern_len;			// 
 
-		char			target[254];			// IP address or hostname
+		char				*host;					// IP address or hostname
+		struct sockaddr_in	sockaddr;				// 
 	}	t_options;
 
 	// Hostnames must not exceed 253 bytes in total, with each label (between dots) up to 63 bytes.

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/16 23:36:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 14:04:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 		int result = parse_options(&options, argc, argv);
 		if (result) return (result - 1);
 
-		printf("%lu\n", options.ip_timestamp);
+		printf("%s\n", options.host);
 		return (result);
 	}
 

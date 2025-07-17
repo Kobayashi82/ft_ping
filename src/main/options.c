@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 13:28:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 14:01:45 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,28 @@
 
 #pragma endregion
 
+#pragma region "Validate Host"
+
+	int validate_host(t_options *options, const char *host) {
+		struct addrinfo hints, *res;
+
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_family = AF_INET;
+		hints.ai_socktype = SOCK_RAW;
+		hints.ai_flags = AI_CANONNAME;
+
+		if (getaddrinfo(host, NULL, &hints, &res)) return (1);
+
+		memcpy(&options->sockaddr, res->ai_addr, res->ai_addrlen);
+		options->host = res->ai_canonname ? strdup(res->ai_canonname) : strdup(host);
+
+		freeaddrinfo(res);
+
+		return (0);
+	}
+
+#pragma endregion
+
 #pragma region "Parse"
 
 	int parse_options(t_options *options, int argc, char **argv) {
@@ -236,14 +258,13 @@
 			}
 		}
 
-		if (optind < argc) strcpy(options->target, argv[optind]);
-		else {
+		if (optind >= argc) {
 			dprintf(2, "ft_ping: missing host operand\n");
 			dprintf(2, "Try 'ft_ping --help' or 'ft_ping --usage' for more information.\n");
 			return (2);
 		}
 
-		// validate host
+		if (validate_host(options, argv[optind])) { dprintf(2, "ft_ping: unknown host\n"); return (2); }
 
 		return (0);
 	}
