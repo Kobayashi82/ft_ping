@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 21:33:37 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 23:54:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,9 @@
 
 #pragma region "Methods"
 
-	void set_signals();
-	void socket_create();
-	void main_loop();
+	void	set_signals();
+	int		socket_create();
+	int		receive_echo_reply(t_options *options, int sockfd);
+	void	main_loop();
 
 #pragma endregion

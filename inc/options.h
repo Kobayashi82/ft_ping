@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 21:27:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 23:40:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 
 	#define _GNU_SOURCE
 
+	#include <errno.h>
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
@@ -23,11 +24,13 @@
 	#include <limits.h>
 	#include <getopt.h>
 	#include <stdbool.h>
+	#include <sys/time.h>
 
 	#include <netdb.h>
 	#include <sys/socket.h>
 	#include <netinet/in.h>
 	#include <arpa/inet.h>
+	#include <netinet/ip_icmp.h>
 
 #pragma endregion
 
