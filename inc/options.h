@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/16 23:46:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/17 13:27:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,47 +14,83 @@
 
 #pragma region "Includes"
 
-	#include <utils.h>
-
+	#include <stdio.h>
+	#include <stdlib.h>
+	#include <string.h>
+	#include <unistd.h>
+	#include <limits.h>
 	#include <getopt.h>
 	#include <stdbool.h>
-	#include <string.h>
-	#include <stdlib.h>
-	#include <stdio.h>
-	#include <errno.h>
+	#include <sys/socket.h>
 
 #pragma endregion
 
-#pragma region "Enumerators"
+#pragma region "Defines"
 
-	enum e_type { ECHO = 1000, ADDRESS = 1001, MASK = 1001, TIMESTAMP = 1002, TSONLY = 1003, TSADDR = 1004 };
+	#define MAX_WAIT		10						// Max seconds to wait for response
+	#define MAX_PATTERN		16						// Maximal length of pattern
+
+	#define ECHO			256
+	#define ADDRESS			257
+	#define TIMESTAMP		258
+
+	#define OPT_FLOOD		0x001
+	#define OPT_INTERVAL	0x002
+	#define OPT_NUMERIC		0x004
+	#define OPT_QUIET		0x008
+	#define OPT_ROUTE		0x010
+	#define OPT_VERBOSE		0x020
+	#define OPT_IPTIMESTAMP	0x040
+	#define OPT_FLOWINFO	0x080
+	#define OPT_TCLASS		0x100
+
+	#define OPT_TSONLY		0x001
+	#define OPT_TSADDR		0x002
+
+	#define MAX_IP_LEN		60
+	#define MAX_ICMP_LEN	76
+	#define MAX_DATA_LEN	(65535 - MAX_IP_LEN - MAX_ICMP_LEN)
+
+	#define PING_PRECISION			1000							// Millisecond precision
+	#define PING_MIN_USER_INTERVAL	(200000 / PING_PRECISION)
+	#define PING_DEFAULT_INTERVAL	1000							// Milliseconds
+
+	// #define PING_SET_INTERVAL(t,i) do {\
+	// (t).tv_sec = (i)/PING_PRECISION;\
+	// (t).tv_usec = ((i)%PING_PRECISION)*(1000000/PING_PRECISION) ;\
+	// } while (0)
 
 #pragma endregion
 
 #pragma region "Structures"
 
+	typedef struct s_stats {
+		double tmin;							// minimum round trip time
+		double tmax;							// maximum round trip time
+		double tsum;							// sum of all times, for doing average
+		double tsumsq;							// sum of all times squared, for std. dev.
+	}	t_stats;
+
 	typedef struct s_options {
+		bool			is_root;				// 
 		unsigned long	type;					// ADDRESS, ECHO, MASK, TIMESTAMP
-		// All request
-		unsigned long	count;					// [-c, --count=NUMBER]			stop after sending NUMBER packets
-		bool			debug;					// [-d, --debug]				set the SO_DEBUG option
-		unsigned long	interval;				// [-i, --interval=NUMBER]		wait NUMBER seconds between sending each packet
-		bool			numeric;				// [-n, --numeric]				do not resolve host addresses
-		bool			ignore_routing;			// [-r, --ignore-routing]		send directly to a host on an attached network
-		unsigned long	ttl;					// [	--ttl=N]				specify N as time-to-live
-		unsigned long	tos;					// [-T, --tos=NUM]				set type of service (TOS) to NUM
-		bool			verbose;				// [-v, --verbose]				verbose output
-		unsigned long	timeout;				// [-w, --timeout=N]			stop after N seconds
-		unsigned long	linger;					// [-W, --linger=N]				number of seconds to wait for response
-		// Echo requests
-		bool			flood;					// [-f, --count=NUMBER]			flood ping (root only)
+		unsigned long	options;				// NUMERIC, VERVOSE, FLOOD, QUIET, ROUTE
+		int				socket_type;			// DEBUG, IGNORE_ROUTING
+
+		size_t			count;					// [-c, --count=NUMBER]			stop after sending NUMBER packets
+		size_t			interval;				// [-i, --interval=NUMBER]		wait NUMBER seconds between sending each packet
+		size_t			ttl;					// [	--ttl=N]				specify N as time-to-live
+		size_t			tos;					// [-T, --tos=NUM]				set type of service (TOS) to NUM
+		size_t			timeout;				// [-w, --timeout=N]			stop after N seconds
+		size_t			linger;					// [-W, --linger=N]				number of seconds to wait for response
+		size_t			size;					// [-s, --size=NUMBER]			send NUMBER data octets
+
 		unsigned long	ip_timestamp;			// [	--ip-timestamp=FLAG]	IP timestamp of type FLAG, which is one of "tsonly" and "tsaddr"
 		unsigned long	preload;				// [-l, --preload=NUMBER]		send NUMBER packets as fast as possible before falling into normal mode of behavior (root only)
-		unsigned char	pattern[65507];			// [-p, --pattern=PATTERN]		fill ICMP packet with given pattern (hex)
-		bool			quiet;					// [-q, --quiet]				quiet output
-		bool			route;					// [-R, --route]				record route
-		unsigned long	size;					// [-s, --size=NUMBER]			send NUMBER data octets
-		// Target
+
+		unsigned char	pattern[MAX_PATTERN];	// [-p, --pattern=PATTERN]		fill ICMP packet with given pattern (hex)
+		int				pattern_len;			// 
+
 		char			target[254];			// IP address or hostname
 	}	t_options;
 
