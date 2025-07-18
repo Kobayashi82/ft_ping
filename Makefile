@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/05 21:39:40 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/17 23:58:19 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/18 15:02:11 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -86,7 +86,10 @@ _compile: $(OBJS)
 
 	@$(MAKE) -s _progress; printf "\n"
 	@$(MAKE) -s _show_cursor
-	sudo setcap cap_net_raw+ep $(NAME)
+
+#	sudo setcap cap_net_raw+ep $(NAME)
+	sudo setcap cap_net_raw,cap_net_admin+ep $(NAME)
+#	sudo setcap -r $(NAME)
 
 # ───────────── #
 # ── OBJECTS ── #

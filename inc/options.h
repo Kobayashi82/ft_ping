@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 23:40:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/18 14:01:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,9 @@
 	#define ECHO			256
 	#define ADDRESS			257
 	#define TIMESTAMP		258
+
+	#define OPT_DEBUG		0x001
+	#define OPT_DONTROUTE	0x002
 
 	#define OPT_FLOOD		0x001
 	#define OPT_INTERVAL	0x002

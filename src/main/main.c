@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/18 00:05:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/18 11:58:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,14 @@
 		int result = parse_options(&ping.options, argc, argv);
 		if (result) return (result - 1);
 		set_signals();
-		int sockfd = socket_create();
+		int sockfd = socket_create_main();
 		if (sockfd < 0) return (1);
-		while (1) {
-			if (receive_echo_reply(&ping.options, sockfd) == 0)
-				usleep(1000000); // 1 segundo entre pings
-		}
+		fprintf(stderr, "Socket created OK\n");
+		// while (1) {
+		// 	if (receive_echo_reply(&ping.options, sockfd) == 0)
+		// 		usleep(1000000); // 1 segundo entre pings
+		// 	break;
+		// }
 
 		return (result);
 	}
