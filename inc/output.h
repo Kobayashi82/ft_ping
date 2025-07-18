@@ -1,17 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   output.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/16 22:51:09 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/17 13:29:11 by vzurera-         ###   ########.fr       */
+/*   Created: 2025/07/18 20:54:49 by vzurera-          #+#    #+#             */
+/*   Updated: 2025/07/18 20:55:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
+
 #pragma region "Includes"
 
-	#include "utils.h"
+
+
+#pragma endregion
+
+#pragma region "Methods"
+
+
 
 #pragma endregion

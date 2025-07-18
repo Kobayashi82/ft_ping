@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/18 11:58:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/18 20:43:27 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,32 +16,48 @@
 
 #pragma endregion
 
+#pragma region "Variables"
+
+	t_ping g_ping;
+
+#pragma endregion
+
 #pragma region "Main"
 
 	int main(int argc, char **argv) {
-		int result = parse_options(&ping.options, argc, argv);
+		int result = parse_options(&g_ping.options, argc, argv);
 		if (result) return (result - 1);
-		set_signals();
-		int sockfd = socket_create_main();
-		if (sockfd < 0) return (1);
-		fprintf(stderr, "Socket created OK\n");
-		// while (1) {
-		// 	if (receive_echo_reply(&ping.options, sockfd) == 0)
-		// 		usleep(1000000); // 1 segundo entre pings
-		// 	break;
-		// }
 
-		return (result);
+		if (set_signals()) return (1);
+
+		// char	packet[MAX_IP_LEN + MAX_ICMP_LEN + MAX_DATA_LEN];
+		// size_t	packet_len = 0;
+
+		if (socket_create()) return (1);
+
+		fprintf(stderr, "Socket created OK\n");
+
+		g_ping.running = true;
+		while (g_ping.running) {
+			;
+		}
+
+		fprintf(stderr, "Show stats\n");
+
+		// socket_create_package(sockfd, packet, &packet_len);
+		// socket_send(sockfd, packet, packet_len);
+
+		close(g_ping.data.sockfd);
+
+		return (0);
 	}
 
 #pragma endregion
 
 // Flujo de ejecución:
-
-// 1. main.c → options.c	(parseo)
-// 2. main.c → network.c	(resolución DNS)
-// 3. main.c → socket.c		(creación socket)
-// 4. main.c → ping.c		(bucle principal)
-// 5. ping.c → icmp.c		(crear paquetes)
-// 6. ping.c → output.c		(mostrar resultados)
-// 7. main.c → stats.c		(estadísticas finales)
+// 
+// main.c → options.c	(parseo)
+// main.c → socket.c	(creación socket)
+// ping.c → icmp.c		(crear paquetes)
+// ping.c → output.c	(mostrar resultados)
+// main.c → stats.c		(estadísticas finales)

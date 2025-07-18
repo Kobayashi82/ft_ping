@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/18 14:01:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/18 19:38:16 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,9 @@
 	#define MAX_WAIT		10						// Max seconds to wait for response
 	#define MAX_PATTERN		16						// Maximal length of pattern
 
-	#define ECHO			256
-	#define ADDRESS			257
-	#define TIMESTAMP		258
+	#define ECHO			0
+	#define ADDRESS			1
+	#define TIMESTAMP		2
 
 	#define OPT_DEBUG		0x001
 	#define OPT_DONTROUTE	0x002
