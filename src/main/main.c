@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 01:13:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 01:23:54 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,6 @@
 		fprintf(stderr, "Socket created OK\n");
 
 		if (pthread_create(&g_ping.thread, NULL, packet_receive, NULL)) { fprintf(stderr, "ft_ping: thread creation failed\n"); return (1); }
- 		// pthread_detach(g_ping.thread);
-		usleep(50000);
 
 		g_ping.running = false;
 		while (g_ping.running) {
@@ -42,8 +40,9 @@
 			packet_send();
 		}
 
-		close(g_ping.data.sockfd);
+	    pthread_cancel(g_ping.thread);
 		pthread_join(g_ping.thread, NULL);
+		close(g_ping.data.sockfd);
 		show_stats();	
 
 		return (0);
