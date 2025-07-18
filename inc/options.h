@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/18 19:38:16 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 00:11:48 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,32 +36,32 @@
 
 #pragma region "Defines"
 
-	#define MAX_WAIT		10						// Max seconds to wait for response
-	#define MAX_PATTERN		16						// Maximal length of pattern
+	#define MAX_WAIT				10				// Max seconds to wait for response
+	#define MAX_PATTERN				16				// Maximal length of pattern
 
-	#define ECHO			0
-	#define ADDRESS			1
-	#define TIMESTAMP		2
+	#define ECHO					0
+	#define ADDRESS					1
+	#define TIMESTAMP				2
 
-	#define OPT_DEBUG		0x001
-	#define OPT_DONTROUTE	0x002
+	#define OPT_DEBUG				0x001
+	#define OPT_DONTROUTE			0x002
 
-	#define OPT_FLOOD		0x001
-	#define OPT_INTERVAL	0x002
-	#define OPT_NUMERIC		0x004
-	#define OPT_QUIET		0x008
-	#define OPT_ROUTE		0x010
-	#define OPT_VERBOSE		0x020
-	#define OPT_IPTIMESTAMP	0x040
-	#define OPT_FLOWINFO	0x080
-	#define OPT_TCLASS		0x100
+	#define OPT_FLOOD				0x001
+	#define OPT_INTERVAL			0x002
+	#define OPT_NUMERIC				0x004
+	#define OPT_QUIET				0x008
+	#define OPT_ROUTE				0x010
+	#define OPT_VERBOSE				0x020
+	#define OPT_IPTIMESTAMP			0x040
+	#define OPT_FLOWINFO			0x080
+	#define OPT_TCLASS				0x100
 
-	#define OPT_TSONLY		0x001
-	#define OPT_TSADDR		0x002
+	#define OPT_TSONLY				0x001
+	#define OPT_TSADDR				0x002
 
-	#define MAX_IP_LEN		60
-	#define MAX_ICMP_LEN	76
-	#define MAX_DATA_LEN	(65535 - MAX_IP_LEN - MAX_ICMP_LEN)
+	#define MAX_IP_LEN				60
+	#define MAX_ICMP_LEN			76
+	#define MAX_DATA_LEN			(65535 - MAX_IP_LEN - MAX_ICMP_LEN)
 
 	#define PING_PRECISION			1000
 	#define PING_MIN_USER_INTERVAL	(200000 / PING_PRECISION)
@@ -72,6 +72,7 @@
 #pragma region "Structures"
 
 	typedef struct s_options {
+		int					pid;					// 
 		bool				is_root;				// 
 		unsigned long		type;					// ADDRESS, ECHO, MASK, TIMESTAMP
 		unsigned long		options;				// NUMERIC, VERVOSE, FLOOD, QUIET, ROUTE
@@ -105,14 +106,8 @@
 
 #pragma endregion
 
-#pragma region "Variables"
-
-
-
-#pragma endregion
-
 #pragma region "Methods"
 
-	int parse_options(t_options *options, int argc, char **argv);
+	int	parse_options(t_options *options, int argc, char **argv);
 
 #pragma endregion

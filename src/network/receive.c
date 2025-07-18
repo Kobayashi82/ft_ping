@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/18 20:52:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 01:13:39 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,15 @@
 
 #pragma region "Needs"
 
-	static inline bool needs_raw(t_options *options)	{ return (options->type != ECHO || options->options & (OPT_FLOOD | OPT_IPTIMESTAMP | OPT_ROUTE) || options->preload); }
+	static inline bool needs_raw(t_options *options) { return (options->type != ECHO || options->options & (OPT_FLOOD | OPT_IPTIMESTAMP | OPT_ROUTE) || options->preload); }
 
 #pragma endregion
 
 #pragma region "Receive"
 
 	// Recibe y procesa respuestas ICMP
-	int receive_echo_reply(t_options *options, int sockfd) {
+	void *packet_receive(void *arg) { (void) arg;
+		t_options	*options = &g_ping.options;
 		char buffer[1024];
 		struct sockaddr_in from;
 		socklen_t from_len = sizeof(from);
@@ -35,17 +36,19 @@
 		double rtt;
 
 		// Configurar timeout
-		struct timeval timeout = { .tv_sec = options->linger ? options->linger : MAX_WAIT, .tv_usec = 0 };
-		if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
-			fprintf(stderr, "ft_ping: setsockopt(SO_RCVTIMEO): %s\n", strerror(errno));
-			return (-1);
+		if (options->linger) {
+			struct timeval timeout = { .tv_sec = options->linger ? options->linger : MAX_WAIT, .tv_usec = 0 };
+			if (setsockopt(g_ping.data.sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+				fprintf(stderr, "ft_ping: setsockopt(SO_RCVTIMEO): %s\n", strerror(errno));
+				return (NULL);
+			}
 		}
 
 		// Recibir respuesta
-		ssize_t received = recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&from, &from_len);
+		ssize_t received = recvfrom(g_ping.data.sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&from, &from_len);
 		if (received < 0) {
 			if (errno != EAGAIN && errno != EWOULDBLOCK) fprintf(stderr, "ft_ping: recvfrom: %s\n", strerror(errno));
-			return (-1);
+			return (NULL);
 		}
 
 		// Procesar paquete recibido
@@ -53,7 +56,7 @@
 		icmp = (struct icmphdr *)(buffer + (ip->ihl << 2));
 		if (received < (ssize_t)(sizeof(*ip) + sizeof(*icmp))) {
 			if (options->options & OPT_VERBOSE) fprintf(stderr, "ft_ping: packet too short (%zd bytes) from %s\n", received, inet_ntoa(g_ping.options.sockaddr.sin_addr));
-			return (-1);
+			return (NULL);
 		}
 
 		// Verificar si es ECHO_REPLY o TIME_EXCEEDED
@@ -64,7 +67,7 @@
 			data_offset += data_len;
 			if (received < (ssize_t)(data_offset + sizeof(send_time))) {
 				if (options->options & OPT_VERBOSE) fprintf(stderr, "ft_ping: packet too short for timestamp: %zd bytes\n", received);
-				return (-1);
+				return (NULL);
 			}
 			memcpy(&send_time, buffer + data_offset, sizeof(send_time));
 			gettimeofday(&recv_time, NULL);
@@ -82,7 +85,7 @@
 			fprintf(stderr, "From %s: Time to live exceeded\n", from_str);
 		}
 
-		return (0);
+		return (NULL);
 	}
 
 #pragma endregion

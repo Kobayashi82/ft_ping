@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:54:49 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/18 20:55:10 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 00:19:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,6 @@
 
 #pragma region "Methods"
 
-
+	void	show_stats();
 
 #pragma endregion

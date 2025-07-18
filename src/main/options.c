@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/18 14:01:20 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 00:11:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@
 
 #pragma region "Validate Host"
 
-	int validate_host(t_options *options, const char *hostname) {
+	static int resolve_host(t_options *options, const char *hostname) {
 		struct addrinfo hints, *res;
 
 		memset(&hints, 0, sizeof(hints));
@@ -187,6 +187,7 @@
 			{0, 0, 0, 0}
 		};
 
+		options->pid = getpid();
 		if (!getuid()) options->is_root = true;
 
 		int		opt;
@@ -265,7 +266,7 @@
 			return (2);
 		}
 
-		if (validate_host(options, argv[optind])) { fprintf(stderr, "ft_ping: unknown host\n"); return (2); }
+		if (resolve_host(options, argv[optind])) { fprintf(stderr, "ft_ping: unknown host\n"); return (2); }
 
 		return (0);
 	}
