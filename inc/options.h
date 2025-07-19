@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 00:11:48 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 11:54:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,15 @@
 
 #pragma region "Defines"
 
-	#define MAX_WAIT				10				// Max seconds to wait for response
-	#define MAX_PATTERN				16				// Maximal length of pattern
+	#define MAX_WAIT				10									// Max seconds to wait for response
+
+	
+	#define IP_HEADER				60									// 
+	#define ICMP_HEADER				8									// 
+	#define MAX_SIZE				(65535 - IP_HEADER - ICMP_HEADER)	// 
+	#define DEFAULT_SIZE			56									// 
+	#define DEFAULT_PATTERN			"abcdefghijklmnopqrstuvwxyz"		// 
+	#define MAX_PATTERN				16									// 
 
 	#define ECHO					0
 	#define ADDRESS					1
@@ -59,9 +66,6 @@
 	#define OPT_TSONLY				0x001
 	#define OPT_TSADDR				0x002
 
-	#define MAX_IP_LEN				60
-	#define MAX_ICMP_LEN			76
-	#define MAX_DATA_LEN			(65535 - MAX_IP_LEN - MAX_ICMP_LEN)
 
 	#define PING_PRECISION			1000
 	#define PING_MIN_USER_INTERVAL	(200000 / PING_PRECISION)

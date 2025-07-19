@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 19:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 00:21:42 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 16:32:40 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,8 @@
 
 #pragma endregion
 
-#pragma region "Needs"
-
-	static inline bool needs_raw(t_options *options) { return (options->type != ECHO || options->options & (OPT_FLOOD | OPT_IPTIMESTAMP | OPT_ROUTE) || options->preload); }
-
-#pragma endregion
-
 #pragma region "Checksum"
 
-	// Calculate ICMP checksum (for SOCK_RAW only)
 	static unsigned short checksum(void *data, int len) {
 		unsigned long	sum = 0;
 		unsigned short	*buf = data;
@@ -39,67 +32,109 @@
 
 #pragma endregion
 
-#pragma region "Create Package"
+#pragma region "RTT"
 
-	int packet_create() {
-		t_options		*options = &g_ping.options;
-		struct timeval	send_time;
+	static void add_timestamp(uint8_t *packet) {
+		struct timeval send_time;
 
-		// Construir y enviar paquete
-		if (needs_raw(options)) {
-			// SOCK_RAW: Construir paquete ICMP
-			struct icmphdr *icmp = (struct icmphdr *)g_ping.data.packet;
-			memset(g_ping.data.packet, 0, MAX_IP_LEN + MAX_ICMP_LEN + MAX_DATA_LEN);
-			icmp->type = ICMP_ECHO;
-			icmp->code = 0;
-			icmp->un.echo.id = getpid() & 0xFFFF;
-			icmp->un.echo.sequence = 1;
+		gettimeofday(&send_time, NULL);
+		memcpy(packet, &send_time, sizeof(send_time));
+	}
 
-			g_ping.data.packet_len = sizeof(*icmp);
-			if (options->size || options->pattern_len) {
-				size_t data_len = options->size ? options->size : (options->pattern_len ? MAX_PATTERN : 0);
-				if (data_len > MAX_DATA_LEN) {
-					fprintf(stderr, "ft_ping: data length too large: %zu\n", data_len);
-					close(g_ping.data.sockfd);
-					return (1);
-				}
-				if (options->pattern_len) {
-					for (size_t i = 0; i < data_len; i++)
-						g_ping.data.packet[sizeof(*icmp) + i] = options->pattern[i % options->pattern_len];
-				} else {
-					memset(g_ping.data.packet + sizeof(*icmp), 0, data_len);
-				}
-				g_ping.data.packet_len += data_len;
-			}
-			// Agregar timestamp para RTT
-			gettimeofday(&send_time, NULL);
-			memcpy(g_ping.data.packet + g_ping.data.packet_len, &send_time, sizeof(send_time));
-			g_ping.data.packet_len += sizeof(send_time);
+#pragma endregion
 
-			icmp->checksum = 0;
-			icmp->checksum = checksum(g_ping.data.packet, g_ping.data.packet_len);
+#pragma region "Pattern"
+
+	static int fill_pattern(size_t data_len) {
+		if (!data_len) return (0);
+
+		if (g_ping.options.pattern_len) {
+			for (size_t i = 0; i < data_len; ++i)
+				g_ping.data.packet[g_ping.data.packet_len + i] = g_ping.options.pattern[i % g_ping.options.pattern_len];
 		} else {
-			// SOCK_DGRAM: Solo datos (si los hay)
-			g_ping.data.packet_len = options->size ? options->size : (options->pattern_len ? MAX_PATTERN : 0);
-			if (g_ping.data.packet_len > MAX_DATA_LEN) {
-				fprintf(stderr, "ft_ping: data length too large: %u\n", g_ping.data.packet_len);
-				close(g_ping.data.sockfd); return (1);
-			}
-			if (g_ping.data.packet_len) {
-				if (options->pattern_len) {
-					for (size_t i = 0; i < g_ping.data.packet_len; i++)
-						g_ping.data.packet[i] = options->pattern[i % options->pattern_len];
-				} else {
-					memset(g_ping.data.packet, 0, g_ping.data.packet_len);
-				}
-			}
-			// Agregar timestamp para RTT
-			gettimeofday(&send_time, NULL);
-			memcpy(g_ping.data.packet + g_ping.data.packet_len, &send_time, sizeof(send_time));
-			g_ping.data.packet_len += sizeof(send_time);
+			uint8_t pattern_len = strlen(DEFAULT_PATTERN);
+			for (size_t i = 0; i < data_len; ++i)
+				g_ping.data.packet[g_ping.data.packet_len + i] = DEFAULT_PATTERN[i % pattern_len];
 		}
 
+		g_ping.data.packet_len += data_len;
+
 		return (0);
+	}
+
+#pragma endregion
+
+#pragma region "RAW"
+
+	static int create_raw_packet(t_options *options, int *sequence) {
+		struct icmphdr *icmp = (struct icmphdr *)g_ping.data.packet;
+		icmp->type = ICMP_ECHO;
+		icmp->code = 0;
+		icmp->checksum = 0;
+		icmp->un.echo.id = getpid() & 0xFFFF;
+		icmp->un.echo.sequence = (*sequence)++;
+		g_ping.data.packet_len += sizeof(*icmp);
+
+		g_ping.data.packet_len += sizeof(struct timeval);
+
+		size_t data_len = (options->size) ? options->size : ((options->pattern_len) ? options->pattern_len : DEFAULT_SIZE);
+		if (data_len < sizeof(struct timeval)) data_len = 0;
+		else data_len -= sizeof(struct timeval);
+
+		if (data_len + sizeof(struct timeval) > MAX_SIZE) {
+			fprintf(stderr, "ft_ping: data length too large: %zu bytes\n", data_len + sizeof(struct timeval));
+			return (1);
+		}
+
+		if (fill_pattern(data_len)) return (2);
+
+		add_timestamp(g_ping.data.packet + sizeof(*icmp));
+		icmp->checksum = checksum(g_ping.data.packet, g_ping.data.packet_len);
+
+		return (0);
+	}
+
+#pragma endregion
+
+#pragma region "UDP"
+
+	static int create_udp_packet(t_options *options) {
+		g_ping.data.packet_len += sizeof(struct timeval);
+
+		size_t data_len = (options->size) ? options->size : ((options->pattern_len) ? options->pattern_len : DEFAULT_SIZE);
+		if (data_len < sizeof(struct timeval)) data_len = 0;
+		else data_len -= sizeof(struct timeval);
+
+		if (data_len + sizeof(struct timeval) > MAX_SIZE) {
+			fprintf(stderr, "ft_ping: data length too large: %zu bytes\n", data_len + sizeof(struct timeval));
+			return (1);
+		}
+
+		if (fill_pattern(data_len)) return (2);
+
+		add_timestamp(g_ping.data.packet);
+
+		return (0);
+	}
+
+#pragma endregion
+
+#pragma region "Create"
+
+	int packet_create() {
+		static int	sequence = 0;
+		int			result = 0;
+
+		memset(g_ping.data.packet, 0, IP_HEADER + ICMP_HEADER + MAX_SIZE);
+		g_ping.data.packet_len = 0;
+
+		switch (g_ping.data.type) {
+			case SOCK_RAW:		result = create_raw_packet(&g_ping.options, &sequence);				break;
+			case SOCK_DGRAM:	result = create_udp_packet(&g_ping.options);						break;
+			default:			result = 1;	fprintf(stderr, "ft_ping: unknown protocol icmp.\n");	break;
+		}
+
+		return (result);
 	}
 
 #pragma endregion

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 21:25:52 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/18 23:37:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 10:54:22 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,9 @@
 				else																fprintf(stderr, "ft_ping: %s\n", strerror(errno));
 				return (1);
 			}
+			g_ping.data.type = SOCK_DGRAM;
 		} else if (g_ping.data.sockfd < 0) { fprintf(stderr, "ft_ping: %s\n", strerror(errno)); return (1); }
+		else g_ping.data.type = SOCK_RAW;
 
 		if (socket_set()) { close(g_ping.data.sockfd); return (1); }
 

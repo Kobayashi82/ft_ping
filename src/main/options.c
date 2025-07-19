@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 00:11:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 13:53:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,7 +210,7 @@
 				case 'T':	if (ft_strtoul(optarg, &options->tos, 255, true))				return (2);			break;
 				case 'w':	if (ft_strtoul(optarg, &options->timeout, INT_MAX, false))		return (2);			break;
 				case 'W':	if (ft_strtoul(optarg, &options->linger, INT_MAX, false))		return (2);			break;
-				case 's':	if (ft_strtoul(optarg, &options->size, MAX_DATA_LEN, true))		return (2);			break;
+				case 's':	if (ft_strtoul(optarg, &options->size, MAX_SIZE, true))			return (2);			break;
 				case 'i': {
 					char *endptr;
 					double value = strtod(optarg, &endptr);

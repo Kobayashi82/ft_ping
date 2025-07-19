@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:40:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 00:49:54 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 13:58:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,13 +47,15 @@
 
 	typedef struct s_data {
 		int				sockfd;
+		uint8_t			type;
 		char			*hostname;
 		size_t			sent;
+		size_t			failed;
 		size_t			received;
 		size_t			duplicated;
 		size_t			count;
 		size_t			interval;
-		char			packet[MAX_IP_LEN + MAX_ICMP_LEN + MAX_DATA_LEN];
+		uint8_t			packet[IP_HEADER + ICMP_HEADER + MAX_SIZE];
 		uint32_t		packet_len;
 		uint16_t		index;
 		t_packet		packets[PACKETS_SIZE];
