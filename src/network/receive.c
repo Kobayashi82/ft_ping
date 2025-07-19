@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 21:05:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 21:17:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,10 +103,10 @@
 				char from_str[INET_ADDRSTRLEN];
 				inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
 				if (!(options->options & OPT_QUIET)) {
-					size_t data_size = (g_ping.data.type == SOCK_DGRAM) ? received : received - (ip->ihl << 2);
-					int ttl = (g_ping.data.type == SOCK_DGRAM) ? 64 : ip->ttl; // TTL no disponible en DGRAM
+					size_t data_len = (g_ping.options.size) ? g_ping.options.size : ((g_ping.options.pattern_len) ? g_ping.options.pattern_len : 56);
+					size_t data_size = data_len + 8;
+					int ttl = (g_ping.data.type == SOCK_DGRAM) ? 64 : ip->ttl;
 					char host[267];
-					// memset(host, 0, sizeof(host));
 					strlcpy(host, from_str, sizeof(host));
 					if (!(options->options & OPT_NUMERIC)) resolve_host(from_str, host);
 
@@ -115,7 +115,7 @@
 				}
 				if (!duplicated) g_ping.data.received++;
 			}
-		} else if (icmp->type == ICMP_TIME_EXCEEDED) { // TTL == 0
+		} else if (icmp->type == ICMP_TIME_EXCEEDED) {
 			struct iphdr *orig_ip = (struct iphdr *)((char *)icmp + sizeof(struct icmphdr));
 			struct icmphdr *orig_icmp = (struct icmphdr *)((char *)orig_ip + (orig_ip->ihl << 2));
 			
@@ -140,10 +140,10 @@
 			if (found) {
 				char from_str[INET_ADDRSTRLEN];
 				inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
-				size_t data_size = (g_ping.data.type == SOCK_DGRAM) ? received : received - (ip->ihl << 2);
+				size_t data_len = (g_ping.options.size) ? g_ping.options.size : ((g_ping.options.pattern_len) ? g_ping.options.pattern_len : 56);
+				size_t data_size = data_len + 8;
 
 				char host[267];
-				// memset(host, 0, sizeof(host));
 				strlcpy(host, from_str, sizeof(host));
 				if (!(options->options & OPT_NUMERIC)) resolve_host(from_str, host);
 

@@ -5,7 +5,7 @@
 |--------|-------------|
 | ☐ --address | send ICMP_ADDRESS packets (root only) |
 | ■ --echo | send ICMP_ECHO packets (default) |
-| ☐ --mask | same as --address |
+| ■ --mask | same as --address |
 | ☐ --timestamp | send ICMP_TIMESTAMP packets |
 | ■ -t, --type=TYPE | send TYPE packets |
 
@@ -27,12 +27,12 @@
 | Opción | Descripción |
 |--------|-------------|
 | ☐ -f, --flood | flood ping (root only) |
-| ☐ --ip-timestamp=FLAG | IP timestamp of type FLAG, which is one of "tsonly" and "tsaddr" |
+| ■ --ip-timestamp=FLAG | IP timestamp of type FLAG, which is one of "tsonly" and "tsaddr" |
 | ☐ -l, --preload=NUMBER | send NUMBER packets as fast as possible before falling into normal mode of behavior (root only) |
-| ☐ -p, --pattern=PATTERN | fill ICMP packet with given pattern (hex) |
+| ■ -p, --pattern=PATTERN | fill ICMP packet with given pattern (hex) |
 | ■ -q, --quiet | quiet output |
-| ☐ -R, --route | record route |
-| ☐ -s, --size=NUMBER | send NUMBER data octets |
+| ■ -R, --route | record route |
+| ■ -s, --size=NUMBER | send NUMBER data octets |
 
 ## Ayuda
 | Opción | Descripción |
@@ -42,3 +42,4 @@
 | ■ -V, --version | print program version |
 
 - timeout en select y bucle
+- -s 0 deberia poner un cuerpo de 0 y no 56 por defecto
