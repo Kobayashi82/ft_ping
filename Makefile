@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/05 21:39:40 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/19 17:53:03 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/19 18:54:38 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,7 @@ NAME		= ft_ping
 # ─────────── #
 
 CC			= clang
-FLAGS		= -Wall -Wextra -Werror -O2 # -march=native
+CFLAGS		= -Wall -Wextra -Werror -O2 # -march=native
 
 # ───────────────── #
 # ── DIRECTORIES ── #
@@ -59,9 +59,8 @@ SRC_DIR		= src/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= main/main.c main/options.c main/signal.c							\
-			  network/socket.c network/icmp.c network/send.c network/receive.c	\
-			  output/output.c output/stats.c
+SRCS		= main/main.c main/options.c main/signal.c main/output.c			\
+			  network/socket.c network/icmp.c network/send.c network/receive.c
 
 # ───────────────────────────────────────────────────────────── #
 # ─────────────────────────── RULES ─────────────────────────── #
@@ -82,7 +81,7 @@ _compile: $(OBJS)
 
 #	Compile library
 	@printf "\r%50s\r\t$(CYAN)Compiling... $(YELLOW)$(NAME)$(NC)"
-	@$(CC) $(FLAGS) -o $(NAME) $(OBJS)
+	@$(CC) $(CFLAGS) -lm -o $(NAME) $(OBJS)
 	@printf "\r%50s\r\t$(CYAN)Compiled    $(GREEN)✓ $(YELLOW)$(NAME)$(NC)\n"
 
 	@$(MAKE) -s _progress; printf "\n"
@@ -108,7 +107,7 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	BAR=$$(printf "/ — \\ |" | cut -d" " -f$$(($(COUNTER) % 4 + 1))); \
 	printf "\r%50s\r\t$(CYAN)Compiling... $(GREEN)$$BAR $(YELLOW)$$filename$(NC)"; \
 	$(eval COUNTER=$(shell echo $$(($(COUNTER)+1))))
-	@$(CC) $(FLAGS) -I$(INC_DIR) -MMD -o $@ -c $<
+	@$(CC) $(CFLAGS) -I$(INC_DIR) -MMD -o $@ -c $<
 
 # ───────────────── #
 # ── EXTRA RULES ── #

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 18:11:57 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 18:54:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@
 		if (result)				return (result - 1);
 		if (set_signals())		return (1);
 		if (socket_create())	return (1);
+
+		show_header();
 
 		fd_set readfds;
 		struct timeval tv, last_send = {0, 0};
@@ -54,7 +56,7 @@
 			int activity = select(g_ping.data.sockfd + 1, &readfds, NULL, NULL, &tv);
 			if (activity > 0 && FD_ISSET(g_ping.data.sockfd, &readfds)) packet_receive();
 
-			if (g_ping.options.count && g_ping.data.received + g_ping.data.failed >= g_ping.options.count) { g_ping.running = false; break; }
+			if (g_ping.options.count && g_ping.data.received + g_ping.data.lost >= g_ping.options.count) { g_ping.running = false; break; }
 		}
 
 		close(g_ping.data.sockfd);
