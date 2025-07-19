@@ -14,7 +14,7 @@
 
 #pragma region "Includes"
 
-
+	#include <netinet/tcp.h>
 
 #pragma endregion
 
@@ -69,5 +69,6 @@
 	int		packet_create();
 	int		packet_send();
 	void	*packet_receive(void *arg);
+	void	packet_receive_single();
 
 #pragma endregion

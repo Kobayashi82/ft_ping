@@ -32,17 +32,6 @@
 
 #pragma endregion
 
-#pragma region "RTT"
-
-	static void add_timestamp(uint8_t *packet) {
-		struct timeval send_time;
-
-		gettimeofday(&send_time, NULL);
-		memcpy(packet, &send_time, sizeof(send_time));
-	}
-
-#pragma endregion
-
 #pragma region "Pattern"
 
 	static int fill_pattern(size_t data_len) {
@@ -75,20 +64,16 @@
 		icmp->un.echo.sequence = (*sequence)++;
 		g_ping.data.packet_len += sizeof(*icmp);
 
-		g_ping.data.packet_len += sizeof(struct timeval);
-
+		// No incluir timestamp en el paquete para reducir overhead
 		size_t data_len = (options->size) ? options->size : ((options->pattern_len) ? options->pattern_len : DEFAULT_SIZE);
-		if (data_len < sizeof(struct timeval)) data_len = 0;
-		else data_len -= sizeof(struct timeval);
-
-		if (data_len + sizeof(struct timeval) > MAX_SIZE) {
-			fprintf(stderr, "ft_ping: data length too large: %zu bytes\n", data_len + sizeof(struct timeval));
+		if (data_len > MAX_SIZE) {
+			fprintf(stderr, "ft_ping: data length too large: %zu bytes\n", data_len);
 			return (1);
 		}
 
 		if (fill_pattern(data_len)) return (2);
 
-		add_timestamp(g_ping.data.packet + sizeof(*icmp));
+		// Calcular checksum sin timestamp
 		icmp->checksum = checksum(g_ping.data.packet, g_ping.data.packet_len);
 
 		return (0);
@@ -99,20 +84,14 @@
 #pragma region "UDP"
 
 	static int create_udp_packet(t_options *options) {
-		g_ping.data.packet_len += sizeof(struct timeval);
-
+		// No incluir timestamp en el paquete para reducir overhead
 		size_t data_len = (options->size) ? options->size : ((options->pattern_len) ? options->pattern_len : DEFAULT_SIZE);
-		if (data_len < sizeof(struct timeval)) data_len = 0;
-		else data_len -= sizeof(struct timeval);
-
-		if (data_len + sizeof(struct timeval) > MAX_SIZE) {
-			fprintf(stderr, "ft_ping: data length too large: %zu bytes\n", data_len + sizeof(struct timeval));
+		if (data_len > MAX_SIZE) {
+			fprintf(stderr, "ft_ping: data length too large: %zu bytes\n", data_len);
 			return (1);
 		}
 
 		if (fill_pattern(data_len)) return (2);
-
-		add_timestamp(g_ping.data.packet);
 
 		return (0);
 	}

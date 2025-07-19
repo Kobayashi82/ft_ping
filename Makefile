@@ -44,7 +44,7 @@ NAME		= ft_ping
 # ─────────── #
 
 CC			= clang
-FLAGS		= -Wall -Wextra -Werror
+FLAGS		= -Wall -Wextra -Werror -O2 -march=native
 
 # ───────────────── #
 # ── DIRECTORIES ── #

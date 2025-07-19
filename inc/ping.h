@@ -19,6 +19,7 @@
 	#include "output.h"
 
 	#include <pthread.h>
+	#include <sys/select.h>
 
 #pragma endregion
 
