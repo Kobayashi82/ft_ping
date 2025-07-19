@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 21:17:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 21:32:34 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,12 +106,9 @@
 					size_t data_len = (g_ping.options.size) ? g_ping.options.size : ((g_ping.options.pattern_len) ? g_ping.options.pattern_len : 56);
 					size_t data_size = data_len + 8;
 					int ttl = (g_ping.data.type == SOCK_DGRAM) ? 64 : ip->ttl;
-					char host[267];
-					strlcpy(host, from_str, sizeof(host));
-					if (!(options->options & OPT_NUMERIC)) resolve_host(from_str, host);
 
-					if (duplicated) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms (duplicated)\n", data_size, host, icmp->un.echo.sequence, ttl, rtt);
-					else			fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", data_size, host, icmp->un.echo.sequence, ttl, rtt);
+					if (duplicated) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms (duplicated)\n", data_size, from_str, icmp->un.echo.sequence, ttl, rtt);
+					else			fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", data_size, from_str, icmp->un.echo.sequence, ttl, rtt);
 				}
 				if (!duplicated) g_ping.data.received++;
 			}
