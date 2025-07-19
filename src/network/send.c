@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:37:11 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 17:55:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 20:16:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,12 @@
 		ssize_t sent = sendto(g_ping.data.sockfd, g_ping.data.packet, g_ping.data.packet_len, 0, (struct sockaddr *)&g_ping.options.sockaddr, sizeof(g_ping.options.sockaddr));
 
 		if (sent < 0) {
-			fprintf(stderr, "ft_ping: sendto: %s\n", strerror(errno));
-			g_ping.data.failed++; return (1);
+			fprintf(stderr, "%s: sending packet: %s\n", g_ping.name, strerror(errno));
+			g_ping.data.failed++; return (2);
 		}
 
 		if ((size_t)sent != g_ping.data.packet_len) {
-			fprintf(stderr, "ft_ping: partial send: sent %zd bytes, expected %u bytes\n", sent, g_ping.data.packet_len);
+			fprintf(stderr, "%s: partial send: sent %zd bytes, expected %u bytes\n", g_ping.name, sent, g_ping.data.packet_len);
 			g_ping.data.failed++; return (1);
 		}
 

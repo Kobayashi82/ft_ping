@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 21:25:52 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 17:45:39 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 20:15:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,20 +37,20 @@
 
 		if (options->ttl) {
 			if (setsockopt(sockfd, IPPROTO_IP, IP_TTL, &options->ttl, sizeof(options->ttl)) < 0) {
-				fprintf(stderr, "ft_ping: setsockopt(IP_TTL): %s\n", strerror(errno));
+				fprintf(stderr, "%s: setsockopt(IP_TTL): %s\n", g_ping.name, strerror(errno));
 				close(sockfd); return (1);
 			}
 		}
 		if (options->tos) {
 			if (setsockopt(sockfd, IPPROTO_IP, IP_TOS, &options->tos, sizeof(options->tos)) < 0) {
-				fprintf(stderr, "ft_ping: setsockopt(IP_TOS): %s\n", strerror(errno));
+				fprintf(stderr, "%s: setsockopt(IP_TOS): %s\n", g_ping.name, strerror(errno));
 				close(sockfd); return (1);
 			}
 		}
 
 		if (options->options & OPT_IPTIMESTAMP) {
 			if (options->ip_timestamp != OPT_TSONLY && options->ip_timestamp != OPT_TSADDR) {
-				fprintf(stderr, "ft_ping: invalid IP timestamp flag: %s\n", (options->ip_timestamp == OPT_TSONLY) ? "tsonly" : "tsaddr");
+				fprintf(stderr, "%s: invalid IP timestamp flag: %s\n", g_ping.name, (options->ip_timestamp == OPT_TSONLY) ? "tsonly" : "tsaddr");
 				close(sockfd); return (1);
 			}
 
@@ -61,7 +61,7 @@
 			optval[3] = (options->ip_timestamp == OPT_TSONLY) ? 1 : 3;
 
 			if (setsockopt(sockfd, IPPROTO_IP, IP_OPTIONS, optval, 20) < 0) {
-				fprintf(stderr, "ft_ping: setsockopt(IP_OPTIONS): %s\n", strerror(errno));
+				fprintf(stderr, "%s: setsockopt(IP_OPTIONS): %s\n", g_ping.name, strerror(errno));
 				close(sockfd); return (1);
 			}
 		}
@@ -73,7 +73,7 @@
 			optval[2] = 4;
 
 			if (setsockopt(sockfd, IPPROTO_IP, IP_OPTIONS, optval, 40) < 0) {
-				fprintf(stderr, "ft_ping: setsockopt(IP_OPTIONS): %s\n", strerror(errno));
+				fprintf(stderr, "%s: setsockopt(IP_OPTIONS): %s\n", g_ping.name, strerror(errno));
 				close(sockfd); return (1);
 			}
 		}
@@ -91,19 +91,19 @@
 
 		g_ping.data.sockfd = -1;
 
-		if (needs_root(options) && !options->is_root)	{ fprintf(stderr, "ft_ping: Lacking privilege for requested operation\n");	return (1); }
-		if (!(proto = getprotobyname ("icmp")))			{ fprintf(stderr, "ft_ping: unknown protocol icmp.\n");						return (1); }
+		if (needs_root(options) && !options->is_root)	{ fprintf(stderr, "%s: Lacking privilege for requested operation\n", g_ping.name);	return (1); }
+		if (!(proto = getprotobyname ("icmp")))			{ fprintf(stderr, "%s: unknown protocol icmp.\n", g_ping.name);						return (1); }
 
 		g_ping.data.sockfd = socket(AF_INET, SOCK_RAW, proto->p_proto);
 		if (g_ping.data.sockfd < 0 && (errno == EPERM || errno == EACCES) && !needs_raw(options)) { errno = 0;
 			g_ping.data.sockfd = socket(AF_INET, SOCK_DGRAM, proto->p_proto);
 			if (g_ping.data.sockfd < 0) {
-				if (errno == EPERM || errno == EACCES || errno == EPROTONOSUPPORT)	fprintf(stderr, "ft_ping: Lacking privilege for icmp socket.\n");
-				else																fprintf(stderr, "ft_ping: %s\n", strerror(errno));
+				if (errno == EPERM || errno == EACCES || errno == EPROTONOSUPPORT)	fprintf(stderr, "%s: Lacking privilege for icmp socket.\n", g_ping.name);
+				else																fprintf(stderr, "%s: %s\n", g_ping.name, strerror(errno));
 				return (1);
 			}
 			g_ping.data.type = SOCK_DGRAM;
-		} else if (g_ping.data.sockfd < 0) { fprintf(stderr, "ft_ping: %s\n", strerror(errno)); return (1); }
+		} else if (g_ping.data.sockfd < 0) { fprintf(stderr, "%s: %s\n", g_ping.name, strerror(errno)); return (1); }
 		else g_ping.data.type = SOCK_RAW;
 
 		if (socket_set()) { close(g_ping.data.sockfd); return (1); }

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 19:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 17:52:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 20:14:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@
 
 		size_t data_len = (g_ping.options.size) ? g_ping.options.size : ((g_ping.options.pattern_len) ? g_ping.options.pattern_len : DEFAULT_SIZE);
 		if (data_len > MAX_SIZE) {
-			fprintf(stderr, "ft_ping: data length too large: %zu bytes\n", data_len);
+			fprintf(stderr, "%s: data length too large: %zu bytes\n", g_ping.name, data_len);
 			return (1);
 		}
 

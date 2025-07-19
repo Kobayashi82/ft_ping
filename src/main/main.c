@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 18:54:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 20:17:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@
 #pragma region "Main"
 
 	int main(int argc, char **argv) {
+		g_ping.name = argv[0];
 		int result = parse_options(&g_ping.options, argc, argv);
 		if (result)				return (result - 1);
 		if (set_signals())		return (1);
@@ -45,7 +46,10 @@
 				result = packet_create();
 				if		(result == 2) { result = 1; break; }
 				else if	(result == 1) { result = 0; g_ping.data.failed++; }
-				else if (result == 0) { packet_send(); last_send = now; }
+				else if (result == 0) {
+					if (packet_send() == 2) { result = 1; break; }
+					last_send = now;
+				}
 			}
 
 			FD_ZERO(&readfds);
@@ -62,7 +66,7 @@
 		close(g_ping.data.sockfd);
 		if (!result) show_stats();
 
-		return (0);
+		return (result);
 	}
 
 #pragma endregion

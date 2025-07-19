@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 18:13:11 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 00:34:39 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 20:14:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@
 		if (result != SIG_ERR) result = signal(SIGTERM, termination_handler);	// Enviada por kill o por otros procesos/sistema para solicitar terminación. Detiene el programa y muestra estadísticas
 		if (result != SIG_ERR) result = signal(SIGHUP,  termination_handler);	// Enviada al cerrar la terminal. Detiene el programa y muestra estadísticas
 
-		if (result == SIG_ERR) { fprintf(stderr, "ft_ping: Failed to set signal handler: %s\n", strerror(errno)); return (1); }
+		if (result == SIG_ERR) { fprintf(stderr, "%s: Failed to set signal handler: %s\n", g_ping.name, strerror(errno)); return (1); }
 
 		return (0);
 	}

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 13:53:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 20:43:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,13 +18,13 @@
 
 #pragma region "Strtoul"
 
-	static int ft_strtoul(const char *optarg, size_t *value, size_t max_value, bool allow_zero) {
+	static int ft_strtoul(char **argv, const char *optarg, size_t *value, size_t max_value, bool allow_zero) {
 		char *endptr;
 		*value = strtoul(optarg, &endptr, 0);
 
-		if (*endptr)							{ fprintf(stderr, "ft_ping: invalid value (`%s' near `%s')\n", optarg, endptr);	return (1); }
-		if (!*value && !allow_zero)				{ fprintf(stderr, "ft_ping: option value too small: %s\n", optarg);				return (1); }
-		if (max_value && *value > max_value)	{ fprintf(stderr, "ft_ping: option value too big: %s\n", optarg);				return (1); }
+		if (*endptr)							{ fprintf(stderr, "%s: invalid value (`%s' near `%s')\n", argv[0], optarg, endptr);	return (1); }
+		if (!*value && !allow_zero)				{ fprintf(stderr, "%s: option value too small: %s\n", argv[0], optarg);				return (1); }
+		if (max_value && *value > max_value)	{ fprintf(stderr, "%s: option value too big: %s\n", argv[0], optarg);				return (1); }
 
 		return (0);
 	}
@@ -198,33 +198,37 @@
 					else if	(!strcasecmp(optarg, "echo"))		options->type = ECHO;
 					else if	(!strcasecmp(optarg, "mask"))		options->type = ADDRESS;
 					else if	(!strcasecmp(optarg, "timestamp"))	options->type = TIMESTAMP;
-					else { fprintf(stderr, "ft_ping: unsupported packet type: %s\n", optarg);	return (2); }
+					else { fprintf(stderr, "%s: unsupported packet type: %s\n", argv[0], optarg);	return (2); }
 					break;
 				}
 				case 'A' :	options->type = ADDRESS;															break;
 				case 'E' :	options->type = ECHO;																break;
 				case 'K' :	options->type = ADDRESS;															break;
 				case 'M' :	options->type = TIMESTAMP;															break;
-				case 'c':	if (ft_strtoul(optarg, &options->count, 0, true))				return (2);			break;
-				case 'L' :	if (ft_strtoul(optarg, &options->ttl, 255, false))				return (2);			break;
-				case 'T':	if (ft_strtoul(optarg, &options->tos, 255, true))				return (2);			break;
-				case 'w':	if (ft_strtoul(optarg, &options->timeout, INT_MAX, false))		return (2);			break;
-				case 'W':	if (ft_strtoul(optarg, &options->linger, INT_MAX, false))		return (2);			break;
-				case 's':	if (ft_strtoul(optarg, &options->size, MAX_SIZE, true))			return (2);			break;
+				case 'c':	if (ft_strtoul(argv, optarg, &options->count, 0, true))				return (2);			break;
+				case 'L' :	if (ft_strtoul(argv, optarg, &options->ttl, 255, false))				return (2);			break;
+				case 'T':	if (ft_strtoul(argv, optarg, &options->tos, 255, true))				return (2);			break;
+				case 'w':	if (ft_strtoul(argv, optarg, &options->timeout, INT_MAX, false))		return (2);			break;
+				case 'W':	if (ft_strtoul(argv, optarg, &options->linger, INT_MAX, false))		return (2);			break;
+				case 's':	if (ft_strtoul(argv, optarg, &options->size, MAX_SIZE, true))			return (2);			break;
 				case 'i': {
 					char *endptr;
 					double value = strtod(optarg, &endptr);
-					if (*endptr) { fprintf(stderr, "ft_ping: invalid value (`%s' near `%s')\n", optarg, endptr); return (2); }
+					if (*endptr) {
+						fprintf(stderr, "ft_ping: invalid value (`%s' near `%s')\n", optarg, endptr);
+						fprintf(stderr, "Try 'ft_ping --help' or 'ft_ping --usage' for more information.\n");
+						return (2);
+					}
 					options->options |= OPT_INTERVAL;
 					options->interval = value * PING_PRECISION;
-					if (!options->is_root && options->interval < PING_MIN_USER_INTERVAL) { fprintf(stderr, "ft_ping: option value too small: %s\n", optarg); return (2); }
+					if (!options->is_root && options->interval < PING_MIN_USER_INTERVAL) { fprintf(stderr, "%s: option value too small: %s\n", argv[0], optarg); return (2); }
 					break;
 				}
 				case 'l': {
 					char *endptr;
 					options->preload = strtoul(optarg, &endptr, 0);
       				if (*endptr || options->preload > INT_MAX) {
-						fprintf(stderr, "ft_ping: invalid preload value (%s)\n", optarg); return (2);
+						fprintf(stderr, "%s: invalid preload value (%s)\n", argv[0], optarg); return (2);
 					}
 					break;
 				}
@@ -232,14 +236,14 @@
 					options->options |= OPT_IPTIMESTAMP;
 					if		(!strcasecmp(optarg, "tsonly"))		options->ip_timestamp = OPT_TSONLY;
 					else if	(!strcasecmp(optarg, "tsaddr"))		options->ip_timestamp = OPT_TSADDR;
-					else { fprintf(stderr, "ft_ping: unsupported timestamp type: %s\n", optarg); return (2); }
+					else { fprintf(stderr, "%s: unsupported timestamp type: %s\n", argv[0], optarg); return (2); }
 					break;
 				}
 				case 'p': {
 					int i, c, off;
 					options->pattern_len = MAX_PATTERN;
 					for (i = 0; *optarg && i < options->pattern_len; ++i) {
-						if (sscanf(optarg, "%2x%n", &c, &off) != 1) { fprintf(stderr, "ft_ping: error in pattern near %s\n", optarg); return (2); }
+						if (sscanf(optarg, "%2x%n", &c, &off) != 1) { fprintf(stderr, "%s: error in pattern near %s\n", argv[0], optarg); return (2); }
 						optarg += off;
 						options->pattern[i] = c;
 					}
@@ -266,7 +270,7 @@
 			return (2);
 		}
 
-		if (resolve_host(options, argv[optind])) { fprintf(stderr, "ft_ping: unknown host\n"); return (2); }
+		if (resolve_host(options, argv[optind])) { fprintf(stderr, "%s: unknown host\n", argv[0]); return (2); }
 
 		return (0);
 	}

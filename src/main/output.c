@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:54:09 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 18:55:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 20:35:45 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 		size_t data_size = (g_ping.options.size) ? g_ping.options.size : ((g_ping.options.pattern_len) ? g_ping.options.pattern_len : DEFAULT_SIZE);
 
 		printf("PING %s (%s): %zu data bytes\n", g_ping.options.hostname, addr_str, data_size);
+		// if (g_ping.options.options & OPT_VERBOSE) printf (", id 0x%04x = %u", ping->ping_ident, ping->ping_ident);
 	}
 
 #pragma endregion
