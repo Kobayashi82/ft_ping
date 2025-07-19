@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 19:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 16:32:40 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 17:16:56 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@
 		icmp->un.echo.sequence = (*sequence)++;
 		g_ping.data.packet_len += sizeof(*icmp);
 
-		// No incluir timestamp en el paquete para reducir overhead
 		size_t data_len = (options->size) ? options->size : ((options->pattern_len) ? options->pattern_len : DEFAULT_SIZE);
 		if (data_len > MAX_SIZE) {
 			fprintf(stderr, "ft_ping: data length too large: %zu bytes\n", data_len);
@@ -73,7 +72,6 @@
 
 		if (fill_pattern(data_len)) return (2);
 
-		// Calcular checksum sin timestamp
 		icmp->checksum = checksum(g_ping.data.packet, g_ping.data.packet_len);
 
 		return (0);
@@ -84,7 +82,6 @@
 #pragma region "UDP"
 
 	static int create_udp_packet(t_options *options) {
-		// No incluir timestamp en el paquete para reducir overhead
 		size_t data_len = (options->size) ? options->size : ((options->pattern_len) ? options->pattern_len : DEFAULT_SIZE);
 		if (data_len > MAX_SIZE) {
 			fprintf(stderr, "ft_ping: data length too large: %zu bytes\n", data_len);

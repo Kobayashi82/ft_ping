@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 21:25:52 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 10:54:22 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 17:15:40 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,20 +29,8 @@
 		t_options	*options = &g_ping.options;
 		int			sockfd = g_ping.data.sockfd;
 
-		// Optimizaciones mínimas pero efectivas para reducir latencia
-		int optval = 1;
-		
-		// Establecer prioridad alta del socket
-		optval = 6; // High priority
-		if (setsockopt(sockfd, SOL_SOCKET, SO_PRIORITY, &optval, sizeof(optval)) < 0) {
-			// No es crítico si falla
-		}
-		
-		// Tiempo bajo de latencia para el socket
-		optval = 1;
-		if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0) {
-			// No es crítico si falla
-		}
+		int optval = 6;	setsockopt(sockfd, SOL_SOCKET, SO_PRIORITY, &optval, sizeof(optval));
+		optval = 1;		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
 
 		if (options->socket_type & OPT_DEBUG)	  { int optval = 1; setsockopt(sockfd, SOL_SOCKET, SO_DEBUG,	 &optval, sizeof(optval)); }
 		if (options->socket_type & OPT_DONTROUTE) { int optval = 1; setsockopt(sockfd, SOL_SOCKET, SO_DONTROUTE, &optval, sizeof(optval)); }

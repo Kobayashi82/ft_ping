@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:40:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 13:58:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 17:12:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,6 @@
 	int		socket_create();
 	int		packet_create();
 	int		packet_send();
-	void	*packet_receive(void *arg);
 	void	packet_receive_single();
 
 #pragma endregion

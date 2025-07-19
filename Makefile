@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/05 21:39:40 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/19 00:47:35 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/19 17:11:10 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,7 @@ NAME		= ft_ping
 # ─────────── #
 
 CC			= clang
-FLAGS		= -Wall -Wextra -Werror -O2 -march=native
+FLAGS		= -Wall -Wextra -Werror -O2 # -march=native
 
 # ───────────────── #
 # ── DIRECTORIES ── #
@@ -59,7 +59,7 @@ SRC_DIR		= src/
 # ── FILES ── #
 # ─────────── #
 
-SRCS		= main/main.c main/options.c main/signal.c main/mutex.c				\
+SRCS		= main/main.c main/options.c main/signal.c							\
 			  network/socket.c network/icmp.c network/send.c network/receive.c	\
 			  output/output.c output/stats.c
 
