@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:40:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 17:12:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 18:06:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,10 @@
 
 	typedef struct s_packet {
 		int				id;
-		uint32_t		packet_len;
-		bool			valid_checksum;
 		bool			sent;
 		bool			received;
 		struct timeval	time_sent;
 		struct timeval	time_received;
-		uint8_t			icmp_type;
-		uint8_t			ttl;
 	}	t_packet;
 
 	typedef struct s_data {
@@ -68,6 +64,6 @@
 	int		socket_create();
 	int		packet_create();
 	int		packet_send();
-	void	packet_receive_single();
+	void	packet_receive();
 
 #pragma endregion

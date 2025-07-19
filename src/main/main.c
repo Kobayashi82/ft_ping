@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 17:24:05 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 18:11:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@
 			tv.tv_usec = 10000; // 10ms
 
 			int activity = select(g_ping.data.sockfd + 1, &readfds, NULL, NULL, &tv);
-			if (activity > 0 && FD_ISSET(g_ping.data.sockfd, &readfds)) packet_receive_single();
+			if (activity > 0 && FD_ISSET(g_ping.data.sockfd, &readfds)) packet_receive();
 
 			if (g_ping.options.count && g_ping.data.received + g_ping.data.failed >= g_ping.options.count) { g_ping.running = false; break; }
 		}

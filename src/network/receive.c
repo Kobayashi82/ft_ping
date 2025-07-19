@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 17:12:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/19 18:12:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,28 +24,24 @@
 
 #pragma region "Receive"
 
-	// Versión single-threaded para máximo rendimiento
-	void packet_receive_single() {
-		t_options	*options = &g_ping.options;
-		char buffer[1024];
-		struct sockaddr_in from;
-		socklen_t from_len = sizeof(from);
-		struct icmphdr *icmp;
-		struct iphdr *ip;
-		struct timeval send_time, recv_time;
-		double rtt;
+	void packet_receive() {
+		t_options			*options = &g_ping.options;
+		char				buffer[1024];
+		struct sockaddr_in	from;
+		socklen_t			from_len = sizeof(from);
+		struct icmphdr		*icmp;
+		struct iphdr		*ip;
+		struct timeval		send_time, recv_time;
+		double				rtt;
 
-		// Recibir respuesta sin bloqueo
 		ssize_t received = recvfrom(g_ping.data.sockfd, buffer, sizeof(buffer), MSG_DONTWAIT, (struct sockaddr *)&from, &from_len);
 		if (received < 0) {
 			if (errno != EAGAIN && errno != EWOULDBLOCK) fprintf(stderr, "ft_ping: recvfrom: %s\n", strerror(errno));
 			return;
 		}
 
-		// Tomar timestamp de recepción inmediatamente
 		gettimeofday(&recv_time, NULL);
 
-		// Procesar paquete recibido
 		ip = (struct iphdr *)buffer;
 		icmp = (struct icmphdr *)(buffer + (ip->ihl << 2));
 		if (received < (ssize_t)(sizeof(*ip) + sizeof(*icmp))) {
@@ -53,39 +49,62 @@
 			return;
 		}
 
-		// Verificar si es ECHO_REPLY o TIME_EXCEEDED
 		if (icmp->type == ICMP_ECHOREPLY && (needs_raw(options) ? icmp->un.echo.id == (getpid() & 0xFFFF) : true)) {
-			// Buscar el paquete enviado correspondiente
-			bool found = false;
-			for (int i = 0; i < g_ping.data.index; i++) {
-				if (g_ping.data.packets[i].id == icmp->un.echo.sequence && 
-					g_ping.data.packets[i].sent && !g_ping.data.packets[i].received) {
-					
-					// Calcular RTT usando timestamps del sistema
-					send_time = g_ping.data.packets[i].time_sent;
-					rtt = (recv_time.tv_sec - send_time.tv_sec) * 1000.0 + (recv_time.tv_usec - send_time.tv_usec) / 1000.0;
-					
-					// Marcar como recibido
-					g_ping.data.packets[i].received = true;
-					g_ping.data.packets[i].time_received = recv_time;
-					found = true;
-					break;
+			bool found = false, duplicated = false;
+			for (int i = 0; i < g_ping.data.index; ++i) {
+				if (g_ping.data.packets[i].id == icmp->un.echo.sequence && g_ping.data.packets[i].sent) {
+					if (!g_ping.data.packets[i].received) {
+						send_time = g_ping.data.packets[i].time_sent;
+						rtt = (recv_time.tv_sec - send_time.tv_sec) * 1000.0 + (recv_time.tv_usec - send_time.tv_usec) / 1000.0;
+						g_ping.data.packets[i].time_received = recv_time;
+						g_ping.data.packets[i].received = true;
+						found = true;
+						break;
+					} else {
+						g_ping.data.duplicated++;
+						found = true; duplicated = true;
+						break;
+					}
 				}
 			}
 			
 			if (found) {
-				// Mostrar salida estándar
 				char from_str[INET_ADDRSTRLEN];
 				inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
-				if (!(options->options & OPT_QUIET)) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", received - (ip->ihl << 2), from_str, icmp->un.echo.sequence, ip->ttl, rtt);
-				g_ping.data.received++;
+				if (!(options->options & OPT_QUIET)) {
+					if (duplicated) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms (duplicated)\n", received - (ip->ihl << 2), from_str, icmp->un.echo.sequence, ip->ttl, rtt);
+					else			fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", received - (ip->ihl << 2), from_str, icmp->un.echo.sequence, ip->ttl, rtt);
+				}
+				if (!duplicated) g_ping.data.received++;
 			}
-		} else if (icmp->type == ICMP_TIME_EXCEEDED && (options->options & OPT_VERBOSE)) {
-			// Mostrar error TTL excedido con -v
-			char from_str[INET_ADDRSTRLEN];
-			inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
-			fprintf(stderr, "From %s: Time to live exceeded\n", from_str);
-			g_ping.data.received++;
+		} else if (icmp->type == ICMP_TIME_EXCEEDED) { // TTL == 0
+			bool found = false, duplicated = false;
+			for (int i = 0; i < g_ping.data.index; ++i) {
+				if (g_ping.data.packets[i].id == icmp->un.echo.sequence && g_ping.data.packets[i].sent) {
+					if (!g_ping.data.packets[i].received) {
+						send_time = g_ping.data.packets[i].time_sent;
+						rtt = (recv_time.tv_sec - send_time.tv_sec) * 1000.0 + (recv_time.tv_usec - send_time.tv_usec) / 1000.0;
+						g_ping.data.packets[i].time_received = recv_time;
+						g_ping.data.packets[i].received = true;
+						found = true;
+						break;
+					} else {
+						g_ping.data.duplicated++;
+						found = true; duplicated = true;
+						break;
+					}
+				}
+			}
+
+			if (found) {
+				char from_str[INET_ADDRSTRLEN];
+				inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
+				if (options->options & OPT_VERBOSE) {
+					if (duplicated)	fprintf(stderr, "From %s: Time to live exceeded (duplicated)\n", from_str);
+					else			fprintf(stderr, "From %s: Time to live exceeded\n", from_str);
+				}
+				if (!duplicated) g_ping.data.received++;
+			}
 		}
 	}
 
