@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 20:20:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 22:24:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,25 @@
 		show_header();
 
 		fd_set readfds;
-		struct timeval tv, last_send = {0, 0};
+		struct timeval tv, last_send = {0, 0}, start_time;
+		gettimeofday(&start_time, NULL);
 
 		g_ping.running = true;
 		while (g_ping.running) {
 			struct timeval now; gettimeofday(&now, NULL);
+			double time_since_start = (now.tv_sec - start_time.tv_sec) + (now.tv_usec - start_time.tv_usec) / 1000000.0;
 			double time_since_last = (now.tv_sec - last_send.tv_sec) + (now.tv_usec - last_send.tv_usec) / 1000000.0;
 			double interval_sec = (g_ping.options.interval) ? g_ping.options.interval / 1000.0 : DEFAULT_INTERVAL / 1000.0;
+			double timeout_to_use = g_ping.options.linger ? g_ping.options.linger : MAX_WAIT;
+
+			if (g_ping.options.timeout && time_since_start >= g_ping.options.timeout) { g_ping.running = false; break; }
+
+			for (int i = 0; i < g_ping.data.index; ++i) {
+				if (g_ping.data.packets[i].sent && !g_ping.data.packets[i].received) {
+					double packet_time = (now.tv_sec - g_ping.data.packets[i].time_sent.tv_sec) + (now.tv_usec - g_ping.data.packets[i].time_sent.tv_usec) / 1000000.0;
+					if (packet_time >= timeout_to_use) { g_ping.data.packets[i].received = true; g_ping.data.lost++; }
+				}
+			}
 
 			if ((!g_ping.options.count || g_ping.data.sent + g_ping.data.failed < g_ping.options.count) && (!last_send.tv_sec || time_since_last >= interval_sec)) {
 				result = packet_create();
@@ -54,13 +66,18 @@
 
 			FD_ZERO(&readfds);
 			FD_SET(g_ping.data.sockfd, &readfds);
-			tv.tv_sec = 0;
-			tv.tv_usec = 10000; // 10ms
+
+			double select_timeout = 0.1;
+			tv.tv_sec = (long)select_timeout;
+			tv.tv_usec = (long)((select_timeout - tv.tv_sec) * 1000000);
 
 			int activity = select(g_ping.data.sockfd + 1, &readfds, NULL, NULL, &tv);
 			if (activity > 0 && FD_ISSET(g_ping.data.sockfd, &readfds)) packet_receive();
 
-			if (g_ping.options.count && g_ping.data.received + g_ping.data.lost + g_ping.data.corrupted >= g_ping.options.count) { g_ping.running = false; break; }
+			if (g_ping.options.count) {
+				size_t total_processed = g_ping.data.received + g_ping.data.lost + g_ping.data.corrupted;
+				if (total_processed >= g_ping.options.count) { g_ping.running = false; break; }
+			}
 		}
 
 		close(g_ping.data.sockfd);
@@ -70,11 +87,3 @@
 	}
 
 #pragma endregion
-
-// Flujo de ejecución:
-// 
-// main.c → options.c	(parseo)
-// main.c → socket.c	(creación socket)
-// ping.c → icmp.c		(crear paquetes)
-// ping.c → output.c	(mostrar resultados)
-// main.c → stats.c		(estadísticas finales)
