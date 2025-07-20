@@ -1,4 +1,6 @@
-/* ************************************************************************** */
+/* *************************************************		bool flood_mode = (g_ping.options.options & OPT_FLOOD) && g_ping.options.is_root;
+		bool can_send = !last_send.tv_sec || (!flood_mode && time_since_last >= interval_sec) || 
+						(flood_mode && time_since_last >= 0.01); // 10ms in flood mode*********************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
@@ -37,37 +39,9 @@
 		struct timeval tv, last_send = {0, 0}, start_time;
 		gettimeofday(&start_time, NULL);
 
-		if (g_ping.options.preload && g_ping.options.is_root) {
-			for (size_t i = 0; i < g_ping.options.preload && (!g_ping.options.count || g_ping.data.sent + g_ping.data.failed < g_ping.options.count); i++) {
-				int result = packet_create();
-				if (result == 2) return (1);
-				else if (result == 1) g_ping.data.failed++;
-				else if (result == 0) {
-					if (packet_send() == 2) return (1);
-					gettimeofday(&last_send, NULL);
-				}
-				
-				fd_set preload_readfds;
-				struct timeval preload_tv;
-				int responses_processed = 0;
-				
-				// Keep checking for responses until timeout or no more packets
-				do {
-					FD_ZERO(&preload_readfds);
-					FD_SET(g_ping.data.sockfd, &preload_readfds);
-					preload_tv.tv_sec = 0;
-					preload_tv.tv_usec = (responses_processed == 0) ? 1000 : 100; // 1ms first try, 100us subsequent
-					
-					int activity = select(g_ping.data.sockfd + 1, &preload_readfds, NULL, NULL, &preload_tv);
-					if (activity > 0 && FD_ISSET(g_ping.data.sockfd, &preload_readfds)) {
-						packet_receive();
-						responses_processed++;
-					} else {
-						break;
-					}
-				} while (responses_processed < 10); // Limit to prevent infinite loop
-			}
-		}
+		bool original_flood = (g_ping.options.options & OPT_FLOOD) != 0;
+		size_t preload_remaining = g_ping.options.preload;
+		if (g_ping.options.preload && g_ping.options.is_root) { g_ping.options.options |= OPT_FLOOD; g_ping.in_preload = true; }
 
 		g_ping.running = true;
 		while (g_ping.running) {
@@ -78,7 +52,7 @@
 			double timeout_to_use = g_ping.options.linger ? g_ping.options.linger : MAX_WAIT;
 
 			bool flood_mode = (g_ping.options.options & OPT_FLOOD) && g_ping.options.is_root;
-			bool can_send = !last_send.tv_sec || (!flood_mode && time_since_last >= interval_sec) || (flood_mode && time_since_last >= 0.01); // 10ms in flood mode
+			bool can_send = !last_send.tv_sec || (!flood_mode && time_since_last >= interval_sec) || (flood_mode && time_since_last >= 0.01);
 			bool all_packets_sent = g_ping.options.count && (g_ping.data.sent + g_ping.data.failed >= g_ping.options.count);
 
 			if (g_ping.options.timeout && time_since_start >= g_ping.options.timeout) { g_ping.running = false; break; }
@@ -98,6 +72,11 @@
 				else if (result == 0) {
 					if (packet_send() == 2) { result = 1; break; }
 					last_send = now;
+
+					if (preload_remaining > 0) {
+						preload_remaining--;
+						if (preload_remaining == 0 && !original_flood) { g_ping.options.options &= ~OPT_FLOOD; g_ping.in_preload = false; }
+					}
 				}
 			}
 
@@ -106,7 +85,7 @@
 			FD_ZERO(&readfds);
 			FD_SET(g_ping.data.sockfd, &readfds);
 
-			double select_timeout = flood_mode ? 0.001 : 0.1; // 1ms for flood, 100ms normal
+			double select_timeout = (flood_mode) ? 0.001 : 0.1; // 1ms for flood, 100ms normal
 			tv.tv_sec = (long)select_timeout;
 			tv.tv_usec = (long)((select_timeout - tv.tv_sec) * 1000000);
 

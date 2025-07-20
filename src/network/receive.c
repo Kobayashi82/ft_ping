@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 23:26:01 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 23:45:17 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@
 					size_t data_size = data_len + 8;
 					int ttl = (g_ping.data.type == SOCK_DGRAM) ? 64 : ip->ttl;
 
-					if ((options->options & OPT_FLOOD)) {
+					if ((options->options & OPT_FLOOD) && !g_ping.in_preload) {
 						printf("\b \b"); fflush(stdout);
 					} else {
 						if (duplicated) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms (duplicated)\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);

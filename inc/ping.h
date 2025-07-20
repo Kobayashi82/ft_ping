@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 23:27:27 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 23:45:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ enum e_actions { MTX_INIT = 100, MTX_LOCK, MTX_UNLOCK, MTX_DESTROY, THRD_CREATE,
 
 	typedef struct s_ping {
 		bool			running;
+		bool			in_preload;
 		char			*name;
 		t_data			data;
 		t_options		options;
