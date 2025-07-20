@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 20:17:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 20:20:25 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@
 		while (g_ping.running) {
 			struct timeval now; gettimeofday(&now, NULL);
 			double time_since_last = (now.tv_sec - last_send.tv_sec) + (now.tv_usec - last_send.tv_usec) / 1000000.0;
-			double interval_sec = (g_ping.options.interval) ? g_ping.options.interval / 1000.0 : 1.0;
+			double interval_sec = (g_ping.options.interval) ? g_ping.options.interval / 1000.0 : DEFAULT_INTERVAL / 1000.0;
 
 			if ((!g_ping.options.count || g_ping.data.sent + g_ping.data.failed < g_ping.options.count) && (!last_send.tv_sec || time_since_last >= interval_sec)) {
 				result = packet_create();
@@ -60,7 +60,7 @@
 			int activity = select(g_ping.data.sockfd + 1, &readfds, NULL, NULL, &tv);
 			if (activity > 0 && FD_ISSET(g_ping.data.sockfd, &readfds)) packet_receive();
 
-			if (g_ping.options.count && g_ping.data.received + g_ping.data.lost >= g_ping.options.count) { g_ping.running = false; break; }
+			if (g_ping.options.count && g_ping.data.received + g_ping.data.lost + g_ping.data.corrupted >= g_ping.options.count) { g_ping.running = false; break; }
 		}
 
 		close(g_ping.data.sockfd);

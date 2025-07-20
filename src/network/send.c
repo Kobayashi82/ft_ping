@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:37:11 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 20:16:26 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 18:08:35 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 	int packet_send() {
 		struct timeval send_time;
 		gettimeofday(&send_time, NULL);
-		
+
 		ssize_t sent = sendto(g_ping.data.sockfd, g_ping.data.packet, g_ping.data.packet_len, 0, (struct sockaddr *)&g_ping.options.sockaddr, sizeof(g_ping.options.sockaddr));
 
 		if (sent < 0) {
@@ -37,7 +37,7 @@
 		if (g_ping.data.index < PACKETS_SIZE) {
 			struct icmphdr *icmp = (struct icmphdr *)g_ping.data.packet;
 			if (g_ping.data.packet_len >= sizeof(struct icmphdr)) {
-				g_ping.data.packets[g_ping.data.index].id = icmp->un.echo.sequence;
+				g_ping.data.packets[g_ping.data.index].id = ntohs(icmp->un.echo.sequence);
 				g_ping.data.packets[g_ping.data.index].time_sent = send_time;
 				g_ping.data.packets[g_ping.data.index].sent = true;
 				g_ping.data.packets[g_ping.data.index].received = false;

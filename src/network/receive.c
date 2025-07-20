@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 21:32:34 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 20:20:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@
 		if (getnameinfo((struct sockaddr*)&sockaddr, sizeof(sockaddr), resolved_hostname, sizeof(resolved_hostname), NULL, 0, 0) != 0) return (1);
 		freeaddrinfo(res);
 
-		if (strcmp(resolved_hostname, hostname) == 0)	strlcpy(host, hostname, 267);
-		else											snprintf(host, 267, "%s (%s)", resolved_hostname, hostname);
+		if (!strcmp(resolved_hostname, hostname))	strlcpy(host, hostname, strlen(hostname));
+		else										snprintf(host, NI_MAXHOST + 20, "%s (%s)", resolved_hostname, hostname);
 
 		return (0);
 	}
@@ -57,7 +57,7 @@
 		struct icmphdr		*icmp;
 		struct iphdr		*ip;
 		struct timeval		send_time, recv_time;
-		double				rtt;
+		double				rtt = 0.0;
 
 		ssize_t received = recvfrom(g_ping.data.sockfd, buffer, sizeof(buffer), MSG_DONTWAIT, (struct sockaddr *)&from, &from_len);
 		if (received < 0) {
@@ -80,10 +80,16 @@
 			return;
 		}
 
-		if (icmp->type == ICMP_ECHOREPLY && (needs_raw(options) ? icmp->un.echo.id == (getpid() & 0xFFFF) : true)) {
+		if (icmp->type == ICMP_ECHOREPLY && (needs_raw(options) ? ntohs(icmp->un.echo.id) == (getpid() & 0xFFFF) : true)) {
+			if (checksum(icmp, received - ((g_ping.data.type == SOCK_DGRAM) ? 0 : (ip->ihl << 2)))) {
+				g_ping.data.corrupted++;
+				if (options->options & OPT_VERBOSE) fprintf(stderr, "%s: invalid checksum from %s\n", g_ping.name, inet_ntoa(from.sin_addr));
+				return;
+			}
+
 			bool found = false, duplicated = false;
 			for (int i = 0; i < g_ping.data.index; ++i) {
-				if (g_ping.data.packets[i].id == icmp->un.echo.sequence && g_ping.data.packets[i].sent) {
+				if (g_ping.data.packets[i].id == ntohs(icmp->un.echo.sequence) && g_ping.data.packets[i].sent) {
 					if (!g_ping.data.packets[i].received) {
 						send_time = g_ping.data.packets[i].time_sent;
 						rtt = (recv_time.tv_sec - send_time.tv_sec) * 1000.0 + (recv_time.tv_usec - send_time.tv_usec) / 1000.0;
@@ -103,22 +109,28 @@
 				char from_str[INET_ADDRSTRLEN];
 				inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
 				if (!(options->options & OPT_QUIET)) {
-					size_t data_len = (g_ping.options.size) ? g_ping.options.size : ((g_ping.options.pattern_len) ? g_ping.options.pattern_len : 56);
+					size_t data_len = (g_ping.options.size) ? g_ping.options.size : DEFAULT_SIZE;
 					size_t data_size = data_len + 8;
 					int ttl = (g_ping.data.type == SOCK_DGRAM) ? 64 : ip->ttl;
 
-					if (duplicated) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms (duplicated)\n", data_size, from_str, icmp->un.echo.sequence, ttl, rtt);
-					else			fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", data_size, from_str, icmp->un.echo.sequence, ttl, rtt);
+					if (duplicated) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms (duplicated)\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
+					else			fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
 				}
 				if (!duplicated) g_ping.data.received++;
 			}
 		} else if (icmp->type == ICMP_TIME_EXCEEDED) {
 			struct iphdr *orig_ip = (struct iphdr *)((char *)icmp + sizeof(struct icmphdr));
 			struct icmphdr *orig_icmp = (struct icmphdr *)((char *)orig_ip + (orig_ip->ihl << 2));
-			
+
+			if (checksum(icmp, received - ((g_ping.data.type == SOCK_DGRAM) ? 0 : (ip->ihl << 2)))) {
+				g_ping.data.corrupted++;
+				if (options->options & OPT_VERBOSE) fprintf(stderr, "%s: invalid checksum from %s\n", g_ping.name, inet_ntoa(from.sin_addr));
+				return;
+			}
+
 			bool found = false, duplicated = false;
 			for (int i = 0; i < g_ping.data.index; ++i) {
-				if (g_ping.data.packets[i].id == orig_icmp->un.echo.sequence && g_ping.data.packets[i].sent) {
+				if (g_ping.data.packets[i].id == ntohs(orig_icmp->un.echo.sequence) && g_ping.data.packets[i].sent) {
 					if (!g_ping.data.packets[i].received) {
 						send_time = g_ping.data.packets[i].time_sent;
 						rtt = (recv_time.tv_sec - send_time.tv_sec) * 1000.0 + (recv_time.tv_usec - send_time.tv_usec) / 1000.0;
@@ -137,10 +149,10 @@
 			if (found) {
 				char from_str[INET_ADDRSTRLEN];
 				inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
-				size_t data_len = (g_ping.options.size) ? g_ping.options.size : ((g_ping.options.pattern_len) ? g_ping.options.pattern_len : 56);
+				size_t data_len = (g_ping.options.size) ? g_ping.options.size : DEFAULT_SIZE;
 				size_t data_size = data_len + 8;
 
-				char host[267];
+				char host[NI_MAXHOST + 32];
 				strlcpy(host, from_str, sizeof(host));
 				if (!(options->options & OPT_NUMERIC)) resolve_host(from_str, host);
 

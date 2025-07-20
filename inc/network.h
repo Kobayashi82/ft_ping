@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:40:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 18:45:52 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 17:52:29 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@
 		size_t			received;
 		size_t			duplicated;
 		size_t			lost;
+		size_t			corrupted;
 		size_t			count;
 		size_t			interval;
 		uint8_t			packet[IP_HEADER + ICMP_HEADER + MAX_SIZE];
@@ -62,9 +63,10 @@
 
 #pragma region "Methods"
 
-	int		socket_create();
-	int		packet_create();
-	int		packet_send();
-	void	packet_receive();
+	unsigned short	checksum(void *data, int len);
+	int				socket_create();
+	int				packet_create();
+	int				packet_send();
+	void			packet_receive();
 
 #pragma endregion

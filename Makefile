@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/05 21:39:40 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/19 18:54:38 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/20 20:21:23 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,7 +43,7 @@ NAME		= ft_ping
 # ── FLAGS ── #
 # ─────────── #
 
-CC			= clang
+CC			= gcc
 CFLAGS		= -Wall -Wextra -Werror -O2 # -march=native
 
 # ───────────────── #
@@ -81,7 +81,7 @@ _compile: $(OBJS)
 
 #	Compile library
 	@printf "\r%50s\r\t$(CYAN)Compiling... $(YELLOW)$(NAME)$(NC)"
-	@$(CC) $(CFLAGS) -lm -o $(NAME) $(OBJS)
+	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -lm 
 	@printf "\r%50s\r\t$(CYAN)Compiled    $(GREEN)✓ $(YELLOW)$(NAME)$(NC)\n"
 
 	@$(MAKE) -s _progress; printf "\n"

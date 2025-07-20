@@ -3,10 +3,10 @@
 ## Tipos de Paquetes ICMP
 | Opción | Descripción |
 |--------|-------------|
-| ☐ --address | send ICMP_ADDRESS packets (root only) |
+| ■ --address | send ICMP_ADDRESS packets (root only) |
 | ■ --echo | send ICMP_ECHO packets (default) |
 | ■ --mask | same as --address |
-| ☐ --timestamp | send ICMP_TIMESTAMP packets |
+| ■ --timestamp | send ICMP_TIMESTAMP packets |
 | ■ -t, --type=TYPE | send TYPE packets |
 
 ## Control de Transmisión
@@ -41,5 +41,8 @@
 | ■ --usage | give a short usage message |
 | ■ -V, --version | print program version |
 
-- timeout en select y bucle
-- -s 0 deberia poner un cuerpo de 0 y no 56 por defecto
+## Otros
+
+- ☐ timeout en select y bucle
+- ☐ -s 0 deberia poner un cuerpo de 0 y no 56 por defecto
+- ☐ meter el puto timestamp en el cuerpo del paquete de los cojones

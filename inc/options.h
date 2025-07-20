@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 11:54:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 20:23:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@
 	#define ICMP_HEADER				8									// 
 	#define MAX_SIZE				(65535 - IP_HEADER - ICMP_HEADER)	// 
 	#define DEFAULT_SIZE			56									// 
-	#define DEFAULT_PATTERN			"abcdefghijklmnopqrstuvwxyz"		// 
 	#define MAX_PATTERN				16									// 
 
 	#define ECHO					0
@@ -66,10 +65,7 @@
 	#define OPT_TSONLY				0x001
 	#define OPT_TSADDR				0x002
 
-
-	#define PING_PRECISION			1000
-	#define PING_MIN_USER_INTERVAL	(200000 / PING_PRECISION)
-	#define PING_DEFAULT_INTERVAL	1000
+	#define DEFAULT_INTERVAL		1000
 
 #pragma endregion
 

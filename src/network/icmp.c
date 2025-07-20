@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 19:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 20:14:25 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 18:13:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 #pragma region "Checksum"
 
-	static unsigned short checksum(void *data, int len) {
+	unsigned short checksum(void *data, int len) {
 		unsigned long	sum = 0;
 		unsigned short	*buf = data;
 
@@ -40,9 +40,8 @@
 				for (size_t i = 0; i < data_len; ++i)
 					g_ping.data.packet[g_ping.data.packet_len + i] = g_ping.options.pattern[i % g_ping.options.pattern_len];
 			} else {
-				uint8_t pattern_len = strlen(DEFAULT_PATTERN);
 				for (size_t i = 0; i < data_len; ++i)
-					g_ping.data.packet[g_ping.data.packet_len + i] = DEFAULT_PATTERN[i % pattern_len];
+					g_ping.data.packet[g_ping.data.packet_len + i] = (uint8_t)(i % 256);
 			}
 
 			g_ping.data.packet_len += data_len;
@@ -62,11 +61,11 @@
 		icmp->type = ICMP_ECHO;
 		icmp->code = 0;
 		icmp->checksum = 0;
-		icmp->un.echo.id = getpid() & 0xFFFF;
-		icmp->un.echo.sequence = sequence++;
+		icmp->un.echo.id = htons(getpid() & 0xFFFF);
+		icmp->un.echo.sequence = htons(sequence++);
 		g_ping.data.packet_len += sizeof(*icmp);
 
-		size_t data_len = (g_ping.options.size) ? g_ping.options.size : ((g_ping.options.pattern_len) ? g_ping.options.pattern_len : DEFAULT_SIZE);
+		size_t data_len = (g_ping.options.size) ? g_ping.options.size : DEFAULT_SIZE;
 		if (data_len > MAX_SIZE) {
 			fprintf(stderr, "%s: data length too large: %zu bytes\n", g_ping.name, data_len);
 			return (1);

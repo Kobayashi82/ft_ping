@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/19 20:43:43 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 20:21:44 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,41 +38,42 @@
 		fprintf(stderr, "Send ICMP ECHO_REQUEST packets to network hosts.\n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, " Options controlling ICMP request types:\n");
-		fprintf(stderr, "       --address              send ICMP_ADDRESS packets (root only)\n");
-		fprintf(stderr, "       --echo                 send ICMP_ECHO packets (default)\n");
-		fprintf(stderr, "       --mask                 same as --address\n");
-		fprintf(stderr, "       --timestamp            send ICMP_TIMESTAMP packets\n");
-		fprintf(stderr, "  -t,  --type=TYPE            send TYPE packets\n");
+		fprintf(stderr, "       --address *            send ICMP_ADDRESS packets\t\t\t\t(deprecated)\n");
+		fprintf(stderr, "       --echo                 send ICMP_ECHO packets\t\t\t\t(default)\n");
+		fprintf(stderr, "       --mask *               same as --address\t\t\t\t\t(deprecated)\n");
+		fprintf(stderr, "       --timestamp *          send ICMP_TIMESTAMP packets\t\t\t(deprecated)\n");
+		fprintf(stderr, "  -t,  --type=TYPE            send TYPE packets\t\t\t\t\t(only '-t echo' is supported)\n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, " Options valid for all request types:\n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, "  -c,  --count=NUMBER         stop after sending NUMBER packets\n");
-		fprintf(stderr, "  -d,  --debug                set the SO_DEBUG option\n");
+		fprintf(stderr, "  -d,  --debug                set the SO_DEBUG option\t\t\t\t(kernel-dependent)\n");
 		fprintf(stderr, "  -i,  --interval=NUMBER      wait NUMBER seconds between sending each packet\n");
 		fprintf(stderr, "  -n,  --numeric              do not resolve host addresses\n");
 		fprintf(stderr, "  -r,  --ignore-routing       send directly to a host on an attached network\n");
 		fprintf(stderr, "       --ttl=N                specify N as time-to-live\n");
-		fprintf(stderr, "  -T,  --tos=NUM              set type of service (TOS) to NUM\n");
+		fprintf(stderr, "  -T,  --tos=NUM              set type of service (TOS) to NUM\t\t\t(ignored by networks)\n");
 		fprintf(stderr, "  -v,  --verbose              verbose output\n");
 		fprintf(stderr, "  -w,  --timeout=N            stop after N seconds\n");
 		fprintf(stderr, "  -W,  --linger=N             number of seconds to wait for response\n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, " Options valid for --echo requests:\n");
 		fprintf(stderr, "\n");
-		fprintf(stderr, "  -f,  --flood                flood ping (root only)\n");
-		fprintf(stderr, "       --ip-timestamp=FLAG    IP timestamp of type FLAG, which is one of\n");
-		fprintf(stderr, "                              \"tsonly\" and \"tsaddr\"\n");
+		fprintf(stderr, "  -f,  --flood                flood ping\t\t\t\t\t(root only)\n");
+		fprintf(stderr, "       --ip-timestamp=FLAG *  IP timestamp of type FLAG, which is one of\n");
+		fprintf(stderr, "                              \"tsonly\" and \"tsaddr\"\t\t\t\t(blocked by networks)\n");
 		fprintf(stderr, "  -l,  --preload=NUMBER       send NUMBER packets as fast as possible before\n");
-		fprintf(stderr, "                              falling into normal mode of behavior (root only)\n");
+		fprintf(stderr, "                              falling into normal mode of behavior\t\t(root only)\n");
 		fprintf(stderr, "  -p,  --pattern=PATTERN      fill ICMP packet with given pattern (hex)\n");
 		fprintf(stderr, "  -q,  --quiet                quiet output\n");
-		fprintf(stderr, "  -R,  --route                record route\n");
+		fprintf(stderr, "  -R,  --route *              record route\t\t\t\t\t(blocked by networks)\n");
 		fprintf(stderr, "  -s,  --size=NUMBER          send NUMBER data octets\n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, "  -h?, --help                 give this help list\n");
 		fprintf(stderr, "       --usage                give a short usage message\n");
 		fprintf(stderr, "  -V,  --version              print program version\n");
 		fprintf(stderr, "\n");
+		fprintf(stderr, "  * Not implemented.\n\n");
 		fprintf(stderr, "Mandatory or optional arguments to long options are also mandatory or optional\n");
 		fprintf(stderr, "for any corresponding short options.\n");
 		fprintf(stderr, "\n");
@@ -190,27 +191,26 @@
 		options->pid = getpid();
 		if (!getuid()) options->is_root = true;
 
-		int		opt;
+		int opt;
 		while ((opt = getopt_long(argc, argv, "t:c:di:nrT:vw:W:fl:p:qRs:h?V", long_options, NULL)) != -1) {
 			switch (opt) {
 				case 't': {
-					if		(!strcasecmp(optarg, "address"))	options->type = ADDRESS;
-					else if	(!strcasecmp(optarg, "echo"))		options->type = ECHO;
-					else if	(!strcasecmp(optarg, "mask"))		options->type = ADDRESS;
-					else if	(!strcasecmp(optarg, "timestamp"))	options->type = TIMESTAMP;
-					else { fprintf(stderr, "%s: unsupported packet type: %s\n", argv[0], optarg);	return (2); }
-					break;
+					if		(!strcasecmp(optarg, "echo"))		{ options->type = ECHO;																					break;		}
+					else if	(!strcasecmp(optarg, "address"))	{ fprintf(stderr, "%s: not implemented packet type: address\n", argv[0]);	options->type = ADDRESS;	return (1); }
+					else if	(!strcasecmp(optarg, "mask"))		{ fprintf(stderr, "%s: not implemented packet type: mask\n", argv[0]);		options->type = ADDRESS;	return (1); }
+					else if	(!strcasecmp(optarg, "timestamp"))	{ fprintf(stderr, "%s: not implemented packet type: timestamp\n", argv[0]);	options->type = TIMESTAMP;	return (1); }
+					else										{ fprintf(stderr, "%s: unsupported packet type: %s\n", argv[0], optarg);								return (2); }
 				}
-				case 'A' :	options->type = ADDRESS;															break;
-				case 'E' :	options->type = ECHO;																break;
-				case 'K' :	options->type = ADDRESS;															break;
-				case 'M' :	options->type = TIMESTAMP;															break;
-				case 'c':	if (ft_strtoul(argv, optarg, &options->count, 0, true))				return (2);			break;
-				case 'L' :	if (ft_strtoul(argv, optarg, &options->ttl, 255, false))				return (2);			break;
-				case 'T':	if (ft_strtoul(argv, optarg, &options->tos, 255, true))				return (2);			break;
-				case 'w':	if (ft_strtoul(argv, optarg, &options->timeout, INT_MAX, false))		return (2);			break;
-				case 'W':	if (ft_strtoul(argv, optarg, &options->linger, INT_MAX, false))		return (2);			break;
-				case 's':	if (ft_strtoul(argv, optarg, &options->size, MAX_SIZE, true))			return (2);			break;
+				case 'E' :	options->type = ECHO;																					break;
+				case 'A' :	fprintf(stderr, "%s: not implemented packet type: address\n", argv[0]);		options->type = ADDRESS;	return (1);
+				case 'K' :	fprintf(stderr, "%s: not implemented packet type: mask\n", argv[0]);		options->type = ADDRESS;	return (1);
+				case 'M' :	fprintf(stderr, "%s: not implemented packet type: timestamp\n", argv[0]);	options->type = TIMESTAMP;	return (1);
+				case 'c':	if (ft_strtoul(argv, optarg, &options->count, 0, true))						return (2);					break;
+				case 'L' :	if (ft_strtoul(argv, optarg, &options->ttl, 255, false))					return (2);					break;
+				case 'T':	if (ft_strtoul(argv, optarg, &options->tos, 255, true))						return (2);					break;
+				case 'w':	if (ft_strtoul(argv, optarg, &options->timeout, INT_MAX, false))			return (2);					break;
+				case 'W':	if (ft_strtoul(argv, optarg, &options->linger, INT_MAX, false))				return (2);					break;
+				case 's':	if (ft_strtoul(argv, optarg, &options->size, MAX_SIZE, true))				return (2);					break;
 				case 'i': {
 					char *endptr;
 					double value = strtod(optarg, &endptr);
@@ -220,24 +220,21 @@
 						return (2);
 					}
 					options->options |= OPT_INTERVAL;
-					options->interval = value * PING_PRECISION;
-					if (!options->is_root && options->interval < PING_MIN_USER_INTERVAL) { fprintf(stderr, "%s: option value too small: %s\n", argv[0], optarg); return (2); }
+					options->interval = value * 1000;
+					if (options->interval < 100) { fprintf(stderr, "%s: option value too small: %s\n", argv[0], optarg); return (2); }
 					break;
 				}
 				case 'l': {
 					char *endptr;
 					options->preload = strtoul(optarg, &endptr, 0);
-      				if (*endptr || options->preload > INT_MAX) {
-						fprintf(stderr, "%s: invalid preload value (%s)\n", argv[0], optarg); return (2);
-					}
+      				if (*endptr || options->preload > INT_MAX) { fprintf(stderr, "%s: invalid preload value (%s)\n", argv[0], optarg); return (2); }
 					break;
 				}
 				case 'I' : {
 					options->options |= OPT_IPTIMESTAMP;
-					if		(!strcasecmp(optarg, "tsonly"))		options->ip_timestamp = OPT_TSONLY;
-					else if	(!strcasecmp(optarg, "tsaddr"))		options->ip_timestamp = OPT_TSADDR;
-					else { fprintf(stderr, "%s: unsupported timestamp type: %s\n", argv[0], optarg); return (2); }
-					break;
+					if		(!strcasecmp(optarg, "tsonly"))	{ fprintf(stderr, "%s: not implemented timestamp type: tsonly\n", argv[0]);	options->ip_timestamp = OPT_TSONLY;	return (1); }
+					else if	(!strcasecmp(optarg, "tsaddr"))	{ fprintf(stderr, "%s: not implemented timestamp type: tsaddr\n", argv[0]);	options->ip_timestamp = OPT_TSADDR;	return (1); }
+					else									{ fprintf(stderr, "%s: unsupported timestamp type: %s\n", argv[0], optarg);										return (2); }
 				}
 				case 'p': {
 					int i, c, off;
@@ -250,17 +247,17 @@
 					options->pattern_len = i;
 					break;
 				}
-				case 'd':	options->socket_type |= OPT_DEBUG;													break;
-				case 'r':	options->socket_type |= OPT_DONTROUTE;												break;
-				case 'n':	options->options |= OPT_NUMERIC;													break;
-				case 'v':	options->options |= OPT_VERBOSE;													break;
-				case 'f':	options->options |= OPT_FLOOD;														break;
-				case 'q':	options->options |= OPT_QUIET;														break;
-				case 'R':	options->options |= OPT_ROUTE;														break;
-				case '?':	if (!strcmp(argv[optind - 1], "-?"))							return (help()); 	return (invalid());
-				case 'h':																	return (help());
-				case 'U' :																	return (usage());
-				case 'V':																	return (version());
+				case 'd':	options->socket_type |= OPT_DEBUG;																break;
+				case 'r':	options->socket_type |= OPT_DONTROUTE;															break;
+				case 'n':	options->options |= OPT_NUMERIC;																break;
+				case 'v':	options->options |= OPT_VERBOSE;																break;
+				case 'f':	options->options |= OPT_FLOOD;																	break;
+				case 'q':	options->options |= OPT_QUIET;																	break;
+				case 'R':	fprintf(stderr, "%s: not implemented record route\n", argv[0]);	options->options |= OPT_ROUTE;	return (1);
+				case '?':	if (!strcmp(argv[optind - 1], "-?"))															return (help());	return (invalid());
+				case 'h':																									return (help());
+				case 'U':																									return (usage());
+				case 'V':																									return (version());
 			}
 		}
 
