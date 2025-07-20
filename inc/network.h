@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:40:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 17:52:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 23:27:22 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,6 @@
 #pragma endregion
 
 #pragma region "Structures"
-
-	typedef struct s_stats {
-		double trip_min;						// minimum round trip time
-		double trip_max;						// maximum round trip time
-		double trip_sum;						// sum of all times, for doing average
-		double trip_sumsq;						// sum of all times squared, for std. dev.
-	}	t_stats;
 
 	typedef struct s_packet {
 		int				id;

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 20:20:06 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 23:26:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,8 @@
 			}
 
 			bool found = false, duplicated = false;
-			for (int i = 0; i < g_ping.data.index; ++i) {
+			int search_limit = (g_ping.data.sent < PACKETS_SIZE) ? g_ping.data.index : PACKETS_SIZE;
+			for (int i = 0; i < search_limit; ++i) {
 				if (g_ping.data.packets[i].id == ntohs(icmp->un.echo.sequence) && g_ping.data.packets[i].sent) {
 					if (!g_ping.data.packets[i].received) {
 						send_time = g_ping.data.packets[i].time_sent;
@@ -113,8 +114,12 @@
 					size_t data_size = data_len + 8;
 					int ttl = (g_ping.data.type == SOCK_DGRAM) ? 64 : ip->ttl;
 
-					if (duplicated) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms (duplicated)\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
-					else			fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
+					if ((options->options & OPT_FLOOD)) {
+						printf("\b \b"); fflush(stdout);
+					} else {
+						if (duplicated) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms (duplicated)\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
+						else			fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
+					}
 				}
 				if (!duplicated) g_ping.data.received++;
 			}
@@ -129,7 +134,8 @@
 			}
 
 			bool found = false, duplicated = false;
-			for (int i = 0; i < g_ping.data.index; ++i) {
+			int search_limit2 = (g_ping.data.sent < PACKETS_SIZE) ? g_ping.data.index : PACKETS_SIZE;
+			for (int i = 0; i < search_limit2; ++i) {
 				if (g_ping.data.packets[i].id == ntohs(orig_icmp->un.echo.sequence) && g_ping.data.packets[i].sent) {
 					if (!g_ping.data.packets[i].received) {
 						send_time = g_ping.data.packets[i].time_sent;

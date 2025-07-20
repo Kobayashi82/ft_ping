@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:54:09 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 18:00:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 23:19:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,9 @@
 		if (total_received > 0) {
 			double min_time = -1, max_time = -1, sum_time = 0;
 			int count = 0;
+			int stats_limit = (g_ping.data.sent < PACKETS_SIZE) ? g_ping.data.index : PACKETS_SIZE;
 
-			for (int i = 0; i < g_ping.data.index; i++) {
+			for (int i = 0; i < stats_limit; i++) {
 				if (g_ping.data.packets[i].received && g_ping.data.packets[i].sent) {
 					struct timeval *sent = &g_ping.data.packets[i].time_sent;
 					struct timeval *recv = &g_ping.data.packets[i].time_received;
@@ -70,7 +71,7 @@
 			if (count > 0) {
 				double avg_time = sum_time / count;
 				double variance = 0;
-				for (int i = 0; i < g_ping.data.index; i++) {
+				for (int i = 0; i < stats_limit; i++) {
 					if (g_ping.data.packets[i].received && g_ping.data.packets[i].sent) {
 						struct timeval *sent = &g_ping.data.packets[i].time_sent;
 						struct timeval *recv = &g_ping.data.packets[i].time_received;

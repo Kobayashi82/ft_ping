@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:37:11 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 18:08:35 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 23:26:26 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,21 @@
 			g_ping.data.failed++; return (1);
 		}
 
-		if (g_ping.data.index < PACKETS_SIZE) {
-			struct icmphdr *icmp = (struct icmphdr *)g_ping.data.packet;
-			if (g_ping.data.packet_len >= sizeof(struct icmphdr)) {
-				g_ping.data.packets[g_ping.data.index].id = ntohs(icmp->un.echo.sequence);
-				g_ping.data.packets[g_ping.data.index].time_sent = send_time;
-				g_ping.data.packets[g_ping.data.index].sent = true;
-				g_ping.data.packets[g_ping.data.index].received = false;
-				g_ping.data.index++;
-			}
+		struct icmphdr *icmp = (struct icmphdr *)g_ping.data.packet;
+		if (g_ping.data.packet_len >= sizeof(struct icmphdr)) {
+			int circular_index = g_ping.data.sent % PACKETS_SIZE;
+			g_ping.data.packets[circular_index].id = ntohs(icmp->un.echo.sequence);
+			g_ping.data.packets[circular_index].time_sent = send_time;
+			g_ping.data.packets[circular_index].sent = true;
+			g_ping.data.packets[circular_index].received = false;
+			
+			if (g_ping.data.index < PACKETS_SIZE) g_ping.data.index++;
 		}
 
 		g_ping.data.sent++;
+		
+		if ((g_ping.options.options & OPT_FLOOD) && g_ping.options.is_root) { printf("."); fflush(stdout); }
+		
 		return (0);
 	}
 

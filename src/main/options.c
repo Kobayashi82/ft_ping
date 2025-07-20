@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 20:21:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/20 22:28:47 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,13 +221,14 @@
 					}
 					options->options |= OPT_INTERVAL;
 					options->interval = value * 1000;
-					if (options->interval < 100) { fprintf(stderr, "%s: option value too small: %s\n", argv[0], optarg); return (2); }
+					if (options->interval < 100) { fprintf(stderr, "%s: option value too small: %s\n", argv[0], optarg); 				return (2); }
 					break;
 				}
 				case 'l': {
+					if (!options->is_root) { fprintf(stderr, "%s: Lacking privilege for requested operation\n", argv[0]);				return (2); }
 					char *endptr;
 					options->preload = strtoul(optarg, &endptr, 0);
-      				if (*endptr || options->preload > INT_MAX) { fprintf(stderr, "%s: invalid preload value (%s)\n", argv[0], optarg); return (2); }
+      				if (*endptr || options->preload > INT_MAX) { fprintf(stderr, "%s: invalid preload value (%s)\n", argv[0], optarg);	return (2); }
 					break;
 				}
 				case 'I' : {
@@ -251,7 +252,9 @@
 				case 'r':	options->socket_type |= OPT_DONTROUTE;															break;
 				case 'n':	options->options |= OPT_NUMERIC;																break;
 				case 'v':	options->options |= OPT_VERBOSE;																break;
-				case 'f':	options->options |= OPT_FLOOD;																	break;
+				case 'f':
+					if (!options->is_root) { fprintf(stderr, "%s: Lacking privilege for requested operation\n", argv[0]);	return (2); }
+					options->options |= OPT_FLOOD;																			break;
 				case 'q':	options->options |= OPT_QUIET;																	break;
 				case 'R':	fprintf(stderr, "%s: not implemented record route\n", argv[0]);	options->options |= OPT_ROUTE;	return (1);
 				case '?':	if (!strcmp(argv[optind - 1], "-?"))															return (help());	return (invalid());
