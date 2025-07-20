@@ -5,8 +5,6 @@
 |--------|-------------|
 | ☐ -T, --tos=NUM | set type of service (TOS) to NUM |
 | ☐ -v, --verbose | verbose output |
-| ☐ -f, --flood | flood ping |
-| ☐ -l, --preload=NUMBER | send NUMBER packets as fast as possible before falling into normal mode of behavior |
 
 ## Otros
 
