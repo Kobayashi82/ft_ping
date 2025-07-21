@@ -10,4 +10,3 @@
 
 - ☐ -s 0 deberia poner un cuerpo de 0 y no 56 por defecto
 - ☐ -s no envia con 999+
-- ☐ calcular RTT con packet
