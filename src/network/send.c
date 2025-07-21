@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:37:11 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/21 22:03:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/21 23:00:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,17 +47,6 @@
 		if ((size_t)sent != g_ping.data.packet_len) {
 			fprintf(stderr, "%s: partial send: sent %zd bytes, expected %u bytes\n", g_ping.name, sent, g_ping.data.packet_len);
 			if (sent >= (ssize_t)sizeof(struct icmphdr)) { g_ping.data.failed++; return (0); }
-		}
-
-		if (g_ping.data.packet_len >= sizeof(struct icmphdr)) {
-			int index = g_ping.data.sent % PACKETS_SIZE;
-			g_ping.data.packets[index].id = ntohs(icmp->un.echo.sequence);
-			g_ping.data.packets[index].time_sent = send_time; // quitar
-			g_ping.data.packets[index].sent = true;
-			g_ping.data.packets[index].received = false;
-
-			if (g_ping.data.index < PACKETS_SIZE)	g_ping.data.index++;
-			else									g_ping.data.index = 0;
 		}
 
 		g_ping.data.sent++;

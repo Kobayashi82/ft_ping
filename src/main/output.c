@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:54:09 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 23:19:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/21 23:11:42 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,58 +34,54 @@
 
 #pragma region "Stats"
 
-	void show_stats() {
-		char addr_str[INET_ADDRSTRLEN];
-		inet_ntop(AF_INET, &g_ping.options.sockaddr.sin_addr, addr_str, INET_ADDRSTRLEN);
+	#pragma region "Show"
 
-		int total_sent = g_ping.data.sent;
-		int total_received = g_ping.data.received;
-		int total_lost = total_sent - total_received;
-		int loss_percent = (total_sent > 0) ? (total_lost * 100) / total_sent : 0;
+		void show_stats() {
+			char addr_str[INET_ADDRSTRLEN];
+			inet_ntop(AF_INET, &g_ping.options.sockaddr.sin_addr, addr_str, INET_ADDRSTRLEN);
 
-		printf("--- %s ping statistics ---\n", g_ping.options.hostname);
-		printf("%d packets transmitted, %d packets received", total_sent, total_received);
+			int total_sent = g_ping.data.sent;
+			int total_received = g_ping.data.received;
+			int total_lost = total_sent - total_received;
+			int loss_percent = (total_sent > 0) ? (total_lost * 100) / total_sent : 0;
 
-		if (g_ping.data.duplicated > 0) printf(", +%zu duplicates", g_ping.data.duplicated);
+			printf("--- %s ping statistics ---\n", g_ping.options.hostname);
+			printf("%d packets transmitted, %d packets received", total_sent, total_received);
+			printf(", %d%% packet loss\n", loss_percent);
 
-		printf(", %d%% packet loss\n", loss_percent);
-
-		if (total_received > 0) {
-			double min_time = -1, max_time = -1, sum_time = 0;
-			int count = 0;
-			int stats_limit = (g_ping.data.sent < PACKETS_SIZE) ? g_ping.data.index : PACKETS_SIZE;
-
-			for (int i = 0; i < stats_limit; i++) {
-				if (g_ping.data.packets[i].received && g_ping.data.packets[i].sent) {
-					struct timeval *sent = &g_ping.data.packets[i].time_sent;
-					struct timeval *recv = &g_ping.data.packets[i].time_received;
-					double rtt = (recv->tv_sec - sent->tv_sec) * 1000.0 + (recv->tv_usec - sent->tv_usec) / 1000.0;
-
-					if (min_time < 0 || rtt < min_time) min_time = rtt;
-					if (max_time < 0 || rtt > max_time) max_time = rtt;
-					sum_time += rtt;
-					count++;
+			if (g_ping.data.rtt_count > 0) {
+				double avg_rtt = g_ping.data.sum_rtt / g_ping.data.rtt_count;
+				double variance = 0.0;
+				
+				if (g_ping.data.rtt_count > 1) {
+					double mean_sq = g_ping.data.sum_rtt_sq / g_ping.data.rtt_count;
+					variance = mean_sq - (avg_rtt * avg_rtt);
+					if (variance < 0) variance = 0.0;
 				}
-			}
-
-			if (count > 0) {
-				double avg_time = sum_time / count;
-				double variance = 0;
-				for (int i = 0; i < stats_limit; i++) {
-					if (g_ping.data.packets[i].received && g_ping.data.packets[i].sent) {
-						struct timeval *sent = &g_ping.data.packets[i].time_sent;
-						struct timeval *recv = &g_ping.data.packets[i].time_received;
-						double rtt = (recv->tv_sec - sent->tv_sec) * 1000.0 + (recv->tv_usec - sent->tv_usec) / 1000.0;
-						double diff = rtt - avg_time;
-						variance += diff * diff;
-					}
-				}
-				double stddev = (count > 1) ? sqrt(variance / (count - 1)) : 0.0;
-
-				printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", min_time, avg_time, max_time, stddev);
+				
+				double stddev = sqrt(variance);
+				
+				printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", 
+					g_ping.data.min_rtt, avg_rtt, g_ping.data.max_rtt, stddev);
 			}
 		}
-	}
+
+	#pragma endregion
+
+	#pragma region "Update"
+
+		void update_stats(double rtt) {
+			if (rtt < 0) return;
+			
+			if (g_ping.data.min_rtt < 0 || rtt < g_ping.data.min_rtt) g_ping.data.min_rtt = rtt;
+			if (g_ping.data.max_rtt < 0 || rtt > g_ping.data.max_rtt) g_ping.data.max_rtt = rtt;
+			
+			g_ping.data.sum_rtt += rtt;
+			g_ping.data.sum_rtt_sq += rtt * rtt;
+			g_ping.data.rtt_count++;
+		}
+
+	#pragma endregion
 
 #pragma endregion
 

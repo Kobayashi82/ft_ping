@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/21 20:45:30 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/21 23:03:57 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,6 @@
 	#include <sys/time.h>
 
 	#include <netdb.h>
-	#include <sys/socket.h>
-	#include <netinet/in.h>
 	#include <arpa/inet.h>
 	#include <netinet/ip_icmp.h>
 
