@@ -6,19 +6,13 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 23:45:17 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/21 20:52:08 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma region "Includes"
 
 	#include "ping.h"
-
-#pragma endregion
-
-#pragma region "Needs"
-
-	static inline bool needs_raw(t_options *options) { return (options->type != ECHO || options->options & (OPT_FLOOD | OPT_IPTIMESTAMP | OPT_ROUTE) || options->preload); }
 
 #pragma endregion
 
@@ -80,8 +74,8 @@
 			return;
 		}
 
-		if (icmp->type == ICMP_ECHOREPLY && (needs_raw(options) ? ntohs(icmp->un.echo.id) == (getpid() & 0xFFFF) : true)) {
-			if (checksum(icmp, received - ((g_ping.data.type == SOCK_DGRAM) ? 0 : (ip->ihl << 2)))) {
+		if (icmp->type == ICMP_ECHOREPLY && ntohs(icmp->un.echo.id) == (getpid() & 0xFFFF)) {
+			if (checksum(icmp, received - (ip->ihl << 2))) {
 				g_ping.data.corrupted++;
 				if (options->options & OPT_VERBOSE) fprintf(stderr, "%s: invalid checksum from %s\n", g_ping.name, inet_ntoa(from.sin_addr));
 				return;
@@ -112,14 +106,10 @@
 				if (!(options->options & OPT_QUIET)) {
 					size_t data_len = (g_ping.options.size) ? g_ping.options.size : DEFAULT_SIZE;
 					size_t data_size = data_len + 8;
-					int ttl = (g_ping.data.type == SOCK_DGRAM) ? 64 : ip->ttl;
+					int ttl = ip->ttl;
 
-					if ((options->options & OPT_FLOOD) && !g_ping.in_preload) {
-						printf("\b \b"); fflush(stdout);
-					} else {
-						if (duplicated) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms (duplicated)\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
-						else			fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
-					}
+					if (duplicated) fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms (duplicated)\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
+					else			fprintf(stdout, "%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
 				}
 				if (!duplicated) g_ping.data.received++;
 			}

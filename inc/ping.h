@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 23:45:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/21 21:06:09 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ enum e_actions { MTX_INIT = 100, MTX_LOCK, MTX_UNLOCK, MTX_DESTROY, THRD_CREATE,
 
 #pragma region "Methods"
 
-	int		set_signals();
 	void	show_header();
 	void	show_stats();
 

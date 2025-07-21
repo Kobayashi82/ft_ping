@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 22:28:47 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/21 21:08:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@
 
 #pragma region "Validate Host"
 
-	static int resolve_host(t_options *options, const char *hostname) {
+	static int validate_host(t_options *options, const char *hostname) {
 		struct addrinfo hints, *res;
 
 		memset(&hints, 0, sizeof(hints));
@@ -156,12 +156,6 @@
 	int parse_options(t_options *options, int argc, char **argv) {
 		memset(options, 0, sizeof(t_options));
 		struct option long_options[] = {
-			// ICMP request types
-			{"address",			no_argument,		0, 'A'},	// [	--address]
-			{"echo",			no_argument,		0, 'E'},	// [	--echo]
-			{"mask",			no_argument,		0, 'K'},	// [	--mask]
-			{"timestamp",		no_argument,		0, 'M'},	// [	--timestamp]
-			{"type",			required_argument,	0, 't'},	// [-t, --type=TYPE]
 			// All request
 			{"count",			required_argument,	0, 'c'},	// [-c, --count=NUMBER]
 			{"debug",			no_argument,		0, 'd'},	// [-d, --debug]	
@@ -174,12 +168,8 @@
 			{"timeout",			required_argument,	0, 'w'},	// [-w, --timeout=N]
 			{"linger",			required_argument,	0, 'W'},	// [-W, --linger=N]
 			// Echo requests
-			{"flood",			no_argument,		0, 'f'},	// [-f, --count=NUMBER]
-			{"ip-timestamp",	required_argument,	0, 'I'},	// [	--ip-timestamp=FLAG]
-			{"preload",			required_argument,	0, 'l'},	// [-l, --preload=NUMBER]
 			{"pattern",			required_argument,	0, 'p'},	// [-p, --pattern=PATTERN]
 			{"quiet",			no_argument,		0, 'q'},	// [-q, --quiet]
-			{"route",			no_argument,		0, 'R'},	// [-R, --route]
 			{"size",			required_argument,	0, 's'},	// [-s, --size=NUMBER]
 			// Info
 			{"help",			no_argument,		0, 'h'},	// [-h?, --help]
@@ -189,22 +179,10 @@
 		};
 
 		options->pid = getpid();
-		if (!getuid()) options->is_root = true;
 
 		int opt;
-		while ((opt = getopt_long(argc, argv, "t:c:di:nrT:vw:W:fl:p:qRs:h?V", long_options, NULL)) != -1) {
+		while ((opt = getopt_long(argc, argv, "c:di:nrT:vw:W:p:qs:h?V", long_options, NULL)) != -1) {
 			switch (opt) {
-				case 't': {
-					if		(!strcasecmp(optarg, "echo"))		{ options->type = ECHO;																					break;		}
-					else if	(!strcasecmp(optarg, "address"))	{ fprintf(stderr, "%s: not implemented packet type: address\n", argv[0]);	options->type = ADDRESS;	return (1); }
-					else if	(!strcasecmp(optarg, "mask"))		{ fprintf(stderr, "%s: not implemented packet type: mask\n", argv[0]);		options->type = ADDRESS;	return (1); }
-					else if	(!strcasecmp(optarg, "timestamp"))	{ fprintf(stderr, "%s: not implemented packet type: timestamp\n", argv[0]);	options->type = TIMESTAMP;	return (1); }
-					else										{ fprintf(stderr, "%s: unsupported packet type: %s\n", argv[0], optarg);								return (2); }
-				}
-				case 'E' :	options->type = ECHO;																					break;
-				case 'A' :	fprintf(stderr, "%s: not implemented packet type: address\n", argv[0]);		options->type = ADDRESS;	return (1);
-				case 'K' :	fprintf(stderr, "%s: not implemented packet type: mask\n", argv[0]);		options->type = ADDRESS;	return (1);
-				case 'M' :	fprintf(stderr, "%s: not implemented packet type: timestamp\n", argv[0]);	options->type = TIMESTAMP;	return (1);
 				case 'c':	if (ft_strtoul(argv, optarg, &options->count, 0, true))						return (2);					break;
 				case 'L' :	if (ft_strtoul(argv, optarg, &options->ttl, 255, false))					return (2);					break;
 				case 'T':	if (ft_strtoul(argv, optarg, &options->tos, 255, true))						return (2);					break;
@@ -221,21 +199,8 @@
 					}
 					options->options |= OPT_INTERVAL;
 					options->interval = value * 1000;
-					if (options->interval < 100) { fprintf(stderr, "%s: option value too small: %s\n", argv[0], optarg); 				return (2); }
+					if (options->interval < 100) { fprintf(stderr, "%s: option value too small: %s\n", argv[0], optarg); return (2); }
 					break;
-				}
-				case 'l': {
-					if (!options->is_root) { fprintf(stderr, "%s: Lacking privilege for requested operation\n", argv[0]);				return (2); }
-					char *endptr;
-					options->preload = strtoul(optarg, &endptr, 0);
-      				if (*endptr || options->preload > INT_MAX) { fprintf(stderr, "%s: invalid preload value (%s)\n", argv[0], optarg);	return (2); }
-					break;
-				}
-				case 'I' : {
-					options->options |= OPT_IPTIMESTAMP;
-					if		(!strcasecmp(optarg, "tsonly"))	{ fprintf(stderr, "%s: not implemented timestamp type: tsonly\n", argv[0]);	options->ip_timestamp = OPT_TSONLY;	return (1); }
-					else if	(!strcasecmp(optarg, "tsaddr"))	{ fprintf(stderr, "%s: not implemented timestamp type: tsaddr\n", argv[0]);	options->ip_timestamp = OPT_TSADDR;	return (1); }
-					else									{ fprintf(stderr, "%s: unsupported timestamp type: %s\n", argv[0], optarg);										return (2); }
 				}
 				case 'p': {
 					int i, c, off;
@@ -252,11 +217,7 @@
 				case 'r':	options->socket_type |= OPT_DONTROUTE;															break;
 				case 'n':	options->options |= OPT_NUMERIC;																break;
 				case 'v':	options->options |= OPT_VERBOSE;																break;
-				case 'f':
-					if (!options->is_root) { fprintf(stderr, "%s: Lacking privilege for requested operation\n", argv[0]);	return (2); }
-					options->options |= OPT_FLOOD;																			break;
 				case 'q':	options->options |= OPT_QUIET;																	break;
-				case 'R':	fprintf(stderr, "%s: not implemented record route\n", argv[0]);	options->options |= OPT_ROUTE;	return (1);
 				case '?':	if (!strcmp(argv[optind - 1], "-?"))															return (help());	return (invalid());
 				case 'h':																									return (help());
 				case 'U':																									return (usage());
@@ -270,7 +231,7 @@
 			return (2);
 		}
 
-		if (resolve_host(options, argv[optind])) { fprintf(stderr, "%s: unknown host\n", argv[0]); return (2); }
+		if (validate_host(options, argv[optind])) { fprintf(stderr, "%s: unknown host\n", argv[0]); return (2); }
 
 		return (0);
 	}

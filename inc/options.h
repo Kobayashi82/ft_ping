@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/20 20:23:31 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/21 20:45:30 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,25 +45,14 @@
 	#define DEFAULT_SIZE			56									// 
 	#define MAX_PATTERN				16									// 
 
-	#define ECHO					0
-	#define ADDRESS					1
-	#define TIMESTAMP				2
-
 	#define OPT_DEBUG				0x001
 	#define OPT_DONTROUTE			0x002
 
-	#define OPT_FLOOD				0x001
 	#define OPT_INTERVAL			0x002
 	#define OPT_NUMERIC				0x004
 	#define OPT_QUIET				0x008
 	#define OPT_ROUTE				0x010
 	#define OPT_VERBOSE				0x020
-	#define OPT_IPTIMESTAMP			0x040
-	#define OPT_FLOWINFO			0x080
-	#define OPT_TCLASS				0x100
-
-	#define OPT_TSONLY				0x001
-	#define OPT_TSADDR				0x002
 
 	#define DEFAULT_INTERVAL		1000
 
@@ -73,8 +62,6 @@
 
 	typedef struct s_options {
 		int					pid;					// 
-		bool				is_root;				// 
-		unsigned long		type;					// ADDRESS, ECHO, MASK, TIMESTAMP
 		unsigned long		options;				// NUMERIC, VERVOSE, FLOOD, QUIET, ROUTE
 		int					socket_type;			// DEBUG, IGNORE_ROUTING
 
@@ -86,9 +73,6 @@
 		size_t				linger;					// [-W, --linger=N]				number of seconds to wait for response
 		size_t				size;					// [-s, --size=NUMBER]			send NUMBER data octets
 
-		unsigned long		ip_timestamp;			// [	--ip-timestamp=FLAG]	IP timestamp of type FLAG, which is one of "tsonly" and "tsaddr"
-		unsigned long		preload;				// [-l, --preload=NUMBER]		send NUMBER packets as fast as possible before falling into normal mode of behavior (root only)
-
 		unsigned char		pattern[MAX_PATTERN];	// [-p, --pattern=PATTERN]		fill ICMP packet with given pattern (hex)
 		int					pattern_len;			// 
 
@@ -96,13 +80,6 @@
 		char				host[INET_ADDRSTRLEN];	// IP address resolved
 		struct sockaddr_in	sockaddr;				// 
 	}	t_options;
-
-	// Hostnames must not exceed 253 bytes in total, with each label (between dots) up to 63 bytes.
-	// Allowed characters are alphanumeric and hyphens (-).
-	// Hyphens cannot appear at the start or end of a label, nor can two hyphens appear consecutively.
-	// Dots (.) are used to separate labels and cannot appear consecutively or at the start or end of the hostname.
-
-	// Pattern length is determine by the option --size or maxsize (65535 - IP header - ICMP header)
 
 #pragma endregion
 
