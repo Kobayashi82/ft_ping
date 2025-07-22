@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 11:23:44 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 18:20:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,5 +42,7 @@
 	void	show_header();
 	void	show_stats();
 	void	update_stats(double rtt);
+	void	show_ip_header(struct iphdr *ip, struct icmphdr *icmp, size_t size);
+	void	show_icmp_info(void *icmp, size_t size);
 
 #pragma endregion

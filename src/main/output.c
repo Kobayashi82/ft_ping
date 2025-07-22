@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:54:09 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 15:15:49 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 18:21:13 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,10 @@
 #pragma region "Header"
 
 	void show_header() {
-		char addr_str[INET_ADDRSTRLEN];
-		inet_ntop(AF_INET, &g_ping.options.sockaddr.sin_addr, addr_str, INET_ADDRSTRLEN);
-
 		size_t data_size = (g_ping.options.size != SIZE_MAX) ? g_ping.options.size : DEFAULT_SIZE;
-
-		printf("PING %s (%s): %zu data bytes\n", g_ping.options.hostname, addr_str, data_size);
-		// if (g_ping.options.options & OPT_VERBOSE) printf (", id 0x%04x = %u", ping->ping_ident, ping->ping_ident);
+		printf("PING %s (%s): %zu data bytes", g_ping.options.hostname, inet_ntoa(g_ping.options.sockaddr.sin_addr), data_size);
+		if (g_ping.options.options & OPT_VERBOSE) printf (", id 0x%04x = %u", htons(getpid() & 0xFFFF), htons(getpid() & 0xFFFF));
+		printf("\n");
 	}
 
 #pragma endregion
@@ -84,4 +81,39 @@
 	#pragma endregion
 
 #pragma endregion
+
+void show_icmp_info(void *icmp, size_t size) {   
+	if (!icmp || size < sizeof(struct iphdr) + sizeof(struct icmphdr)) return;
+
+	struct iphdr	*embedded_ip = (struct iphdr *)((char*)icmp + sizeof(struct icmphdr));
+	struct icmphdr	*embedded_icmp = (struct icmphdr *)((char*)embedded_ip + (embedded_ip->ihl << 2));
+
+	size_t total_icmp_size = ntohs(embedded_ip->tot_len) - (embedded_ip->ihl << 2);
+
+	fprintf(stderr, "ICMP: type %d, code %d, size %zu, id 0x%04x, seq 0x%04x\n", embedded_icmp->type, embedded_icmp->code, total_icmp_size, ntohs(embedded_icmp->un.echo.id), ntohs(embedded_icmp->un.echo.sequence));
+}
+
+void show_ip_header(struct iphdr *ip, struct icmphdr *icmp, size_t size) {
+	struct iphdr *target_ip = ip;
+
+	if (icmp) {
+		if (icmp->type == ICMP_TIME_EXCEEDED && size >= sizeof(struct iphdr))
+			target_ip = (struct iphdr *)((char*)icmp + sizeof(struct icmphdr));
+	}
+	
+	fprintf(stderr, "IP Hdr Dump:\n ");
+	unsigned char *p = (unsigned char *)target_ip;
+	for (size_t j = 0; j < sizeof(*target_ip); j++) fprintf(stderr, "%02x%s", p[j], (j % 2) ? " " : "");
+
+	char	src_str[INET_ADDRSTRLEN];
+	char	dst_str[INET_ADDRSTRLEN];
+	struct	in_addr src_addr, dst_addr;
+	src_addr.s_addr = target_ip->saddr;
+	dst_addr.s_addr = target_ip->daddr;
+	inet_ntop(AF_INET, &src_addr, src_str, INET_ADDRSTRLEN);
+	inet_ntop(AF_INET, &dst_addr, dst_str, INET_ADDRSTRLEN);
+	
+	fprintf(stderr, "\nVr HL TOS  Len   ID Flg  off TTL Pro  cks      Src      Dst     Data\n");
+	fprintf(stderr, " %1x  %1x  %02x %04x %04x   %1x %04x  %02x  %02x %04x %s %s\n", target_ip->version, target_ip->ihl, target_ip->tos, ntohs(target_ip->tot_len), ntohs(target_ip->id), (ntohs(target_ip->frag_off) & 0xe000) >> 13, ntohs(target_ip->frag_off) & 0x1fff, target_ip->ttl, target_ip->protocol, ntohs(target_ip->check), src_str, dst_str);
+}
 
