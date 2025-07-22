@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 15:32:18 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:55:41 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,10 @@ void initialize(char *arg) {
 			FD_ZERO(&readfds);
 			FD_SET(g_ping.data.sockfd, &readfds);
 			int activity = select(g_ping.data.sockfd + 1, &readfds, NULL, NULL, &select_timeout);
-			if (activity > 0 && FD_ISSET(g_ping.data.sockfd, &readfds)) packet_receive();
+			if (activity < 0) {
+				if (errno != EINTR) { fprintf(stderr, "%s: select failed\n", g_ping.name); result = 1; break; }
+				continue;
+			} else if (FD_ISSET(g_ping.data.sockfd, &readfds)) packet_receive();
 
 			if (g_ping.options.count && g_ping.data.received + g_ping.data.lost + g_ping.data.corrupted >= g_ping.options.count) { g_ping.running = false; break; }
 		}

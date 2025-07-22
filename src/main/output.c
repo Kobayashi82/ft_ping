@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:54:09 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 18:21:13 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 20:14:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,8 @@ void show_icmp_info(void *icmp, size_t size) {
 
 	struct iphdr	*embedded_ip = (struct iphdr *)((char*)icmp + sizeof(struct icmphdr));
 	struct icmphdr	*embedded_icmp = (struct icmphdr *)((char*)embedded_ip + (embedded_ip->ihl << 2));
+	
+	if (!(g_ping.options.options & OPT_VERBOSE) || embedded_ip->daddr != g_ping.options.sockaddr.sin_addr.s_addr) return;
 
 	size_t total_icmp_size = ntohs(embedded_ip->tot_len) - (embedded_ip->ihl << 2);
 

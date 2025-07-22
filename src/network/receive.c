@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 18:21:36 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:50:23 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@
 
 		if (icmp->type == ICMP_ECHOREPLY && ntohs(icmp->un.echo.id) == (getpid() & 0xFFFF)) {
 			if (checksum(icmp, received - (ip->ihl << 2))) {
-				if (g_ping.options.options & OPT_VERBOSE) fprintf(stderr, "%s: invalid checksum from %s\n", g_ping.name, inet_ntoa(from.sin_addr));
+				if (g_ping.options.options & OPT_VERBOSE) fprintf(stderr, "%s: checksum mismatch from %s\n", g_ping.name, inet_ntoa(from.sin_addr));
 				g_ping.data.corrupted++; return;
 			}
 
@@ -97,7 +97,7 @@
 			g_ping.data.received++;
 		} else if (icmp->type == ICMP_TIME_EXCEEDED) {
 			if (checksum(icmp, received - (ip->ihl << 2))) {
-				if (g_ping.options.options & OPT_VERBOSE) fprintf(stderr, "%s: invalid checksum from %s\n", g_ping.name, inet_ntoa(from.sin_addr));
+				if (g_ping.options.options & OPT_VERBOSE) fprintf(stderr, "%s: checksum mismatch from %s\n", g_ping.name, inet_ntoa(from.sin_addr));
 				g_ping.data.corrupted++; return;
 			}
 

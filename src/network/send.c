@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:37:11 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 15:35:10 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 20:27:50 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,13 @@
 
 		if (sent < 0) {
 			fprintf(stderr, "%s: sending packet: %s\n", g_ping.name, strerror(errno));
-			g_ping.data.failed++; return (0);
+			g_ping.data.failed++; return (1);
 		}
 
 		if ((size_t)sent != g_ping.data.packet_len) {
-			fprintf(stderr, "%s: partial send: sent %zd bytes, expected %u bytes\n", g_ping.name, sent, g_ping.data.packet_len);
-			if (sent >= (ssize_t)sizeof(struct icmphdr)) { g_ping.data.failed++; return (0); }
+			fprintf(stderr, "%s: ping: wrote %s %u chars, ret=%ld\n", g_ping.name, g_ping.options.hostname, g_ping.data.packet_len, sent);
+			if (sent >= (ssize_t)sizeof(struct icmphdr)) g_ping.data.failed++;
+			return (0);
 		}
 
 		g_ping.data.sent++;
