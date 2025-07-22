@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/21 21:08:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 14:57:03 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,47 +37,31 @@
 		fprintf(stderr, "Usage: ft_ping [OPTION...] HOST ...\n");
 		fprintf(stderr, "Send ICMP ECHO_REQUEST packets to network hosts.\n");
 		fprintf(stderr, "\n");
-		fprintf(stderr, " Options controlling ICMP request types:\n");
-		fprintf(stderr, "       --address *            send ICMP_ADDRESS packets\t\t\t\t(deprecated)\n");
-		fprintf(stderr, "       --echo                 send ICMP_ECHO packets\t\t\t\t(default)\n");
-		fprintf(stderr, "       --mask *               same as --address\t\t\t\t\t(deprecated)\n");
-		fprintf(stderr, "       --timestamp *          send ICMP_TIMESTAMP packets\t\t\t(deprecated)\n");
-		fprintf(stderr, "  -t,  --type=TYPE            send TYPE packets\t\t\t\t\t(only '-t echo' is supported)\n");
-		fprintf(stderr, "\n");
-		fprintf(stderr, " Options valid for all request types:\n");
-		fprintf(stderr, "\n");
-		fprintf(stderr, "  -c,  --count=NUMBER         stop after sending NUMBER packets\n");
-		fprintf(stderr, "  -d,  --debug                set the SO_DEBUG option\t\t\t\t(kernel-dependent)\n");
-		fprintf(stderr, "  -i,  --interval=NUMBER      wait NUMBER seconds between sending each packet\n");
+		fprintf(stderr, "  -c,  --count=NUM            stop after sending NUM packets\n");
+		fprintf(stderr, "  -d,  --debug                set the SO_DEBUG option (kernel-dependent)\n");
+		fprintf(stderr, "  -i,  --interval=NUM         wait NUM seconds between sending each packet\n");
 		fprintf(stderr, "  -n,  --numeric              do not resolve host addresses\n");
 		fprintf(stderr, "  -r,  --ignore-routing       send directly to a host on an attached network\n");
 		fprintf(stderr, "       --ttl=N                specify N as time-to-live\n");
-		fprintf(stderr, "  -T,  --tos=NUM              set type of service (TOS) to NUM\t\t\t(ignored by networks)\n");
+		fprintf(stderr, "  -T,  --tos=NUM              set type of service (TOS) to NUM (often ignored)\n");
+		fprintf(stderr, "                                 - Low Delay:              16\n");
+		fprintf(stderr, "                                 - High Reliability:       4\n");
+		fprintf(stderr, "                                 - High Throughput:        8\n");
+		fprintf(stderr, "                                 - High Priority:          136\n");
+		fprintf(stderr, "                                 - Expedited Forwarding:   184\n");
 		fprintf(stderr, "  -v,  --verbose              verbose output\n");
-		fprintf(stderr, "  -w,  --timeout=N            stop after N seconds\n");
-		fprintf(stderr, "  -W,  --linger=N             number of seconds to wait for response\n");
-		fprintf(stderr, "\n");
-		fprintf(stderr, " Options valid for --echo requests:\n");
-		fprintf(stderr, "\n");
-		fprintf(stderr, "  -f,  --flood                flood ping\t\t\t\t\t(root only)\n");
-		fprintf(stderr, "       --ip-timestamp=FLAG *  IP timestamp of type FLAG, which is one of\n");
-		fprintf(stderr, "                              \"tsonly\" and \"tsaddr\"\t\t\t\t(blocked by networks)\n");
-		fprintf(stderr, "  -l,  --preload=NUMBER       send NUMBER packets as fast as possible before\n");
-		fprintf(stderr, "                              falling into normal mode of behavior\t\t(root only)\n");
+		fprintf(stderr, "  -w,  --timeout=NUM          stop after NUM seconds\n");
+		fprintf(stderr, "  -W,  --linger=NUM           number of seconds to wait for response\n");
 		fprintf(stderr, "  -p,  --pattern=PATTERN      fill ICMP packet with given pattern (hex)\n");
 		fprintf(stderr, "  -q,  --quiet                quiet output\n");
-		fprintf(stderr, "  -R,  --route *              record route\t\t\t\t\t(blocked by networks)\n");
-		fprintf(stderr, "  -s,  --size=NUMBER          send NUMBER data octets\n");
+		fprintf(stderr, "  -s,  --size=NUM             send NUM data octets\n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, "  -h?, --help                 give this help list\n");
 		fprintf(stderr, "       --usage                give a short usage message\n");
 		fprintf(stderr, "  -V,  --version              print program version\n");
 		fprintf(stderr, "\n");
-		fprintf(stderr, "  * Not implemented.\n\n");
 		fprintf(stderr, "Mandatory or optional arguments to long options are also mandatory or optional\n");
 		fprintf(stderr, "for any corresponding short options.\n");
-		fprintf(stderr, "\n");
-		fprintf(stderr, "Options marked with (root only) are available only to superuser.\n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, "Report bugs to <kobayashi82@outlook.com>.\n");
 
@@ -89,13 +73,12 @@
 #pragma region "Usage"
 
 	static int usage() {
-		fprintf(stderr, "Usage: ft_ping [-dnrvfqR?V] [-t TYPE] [-c NUMBER] [-i NUMBER] [-T NUM] [-w N]\n");
-		fprintf(stderr, "               [-W N] [-l NUMBER] [-p PATTERN] [-s NUMBER] [--address] [--echo]\n");
-		fprintf(stderr, "               [--mask] [--timestamp] [--type=TYPE] [--count=NUMBER] [--debug]\n");
-		fprintf(stderr, "               [--interval=NUMBER] [--numeric] [--ignore-routing] [--ttl=N]\n");
-		fprintf(stderr, "               [--tos=NUM] [--verbose] [--timeout=N] [--linger=N] [--flood]\n");
-		fprintf(stderr, "               [--ip-timestamp=FLAG] [--preload=NUMBER] [--pattern=PATTERN]\n");
-		fprintf(stderr, "               [--quiet] [--route] [--size=NUMBER] [--help] [--usage] [--version]\n");
+		fprintf(stderr, "Usage: ft_ping [-c NUM, --count=NUMBER] [-i NUM, --interval=NUM]\n");
+		fprintf(stderr, "               [-w NUM, --timeout=NUM]  [-W NUM, --linger=NUM]\n");
+		fprintf(stderr, "               [-s NUM, --size=NUM]     [-p PATTERN, --pattern=PATTERN]\n");
+		fprintf(stderr, "               [-T NUM, --tos=NUM]      [-r, --ignore-routing] [--ttl=NUM]\n");
+		fprintf(stderr, "               [-d, --debug] [-n, --numeric] [-v, --verbose] [-q, --quiet]\n");
+		fprintf(stderr, "               [-h?, --help] [-u, --usage]   [-V, --version]\n");
 		fprintf(stderr, "               HOST ...\n");
 
 		return (1);
@@ -156,10 +139,9 @@
 	int parse_options(t_options *options, int argc, char **argv) {
 		memset(options, 0, sizeof(t_options));
 		struct option long_options[] = {
-			// All request
-			{"count",			required_argument,	0, 'c'},	// [-c, --count=NUMBER]
+			{"count",			required_argument,	0, 'c'},	// [-c, --count=NUM]
 			{"debug",			no_argument,		0, 'd'},	// [-d, --debug]	
-			{"interval",		required_argument,	0, 'i'},	// [-i, --interval=NUMBER]
+			{"interval",		required_argument,	0, 'i'},	// [-i, --interval=NUM]
 			{"numeric",			no_argument,		0, 'n'},	// [-n, --numeric]	
 			{"ignore-routing",	no_argument,		0, 'r'},	// [-r, --ignore-routing]
 			{"ttl",				required_argument,	0, 'L'},	// [	--ttl=N]	
@@ -167,13 +149,11 @@
 			{"verbose",			no_argument,		0, 'v'},	// [-v, --verbose]
 			{"timeout",			required_argument,	0, 'w'},	// [-w, --timeout=N]
 			{"linger",			required_argument,	0, 'W'},	// [-W, --linger=N]
-			// Echo requests
 			{"pattern",			required_argument,	0, 'p'},	// [-p, --pattern=PATTERN]
 			{"quiet",			no_argument,		0, 'q'},	// [-q, --quiet]
-			{"size",			required_argument,	0, 's'},	// [-s, --size=NUMBER]
-			// Info
+			{"size",			required_argument,	0, 's'},	// [-s, --size=NUM]
 			{"help",			no_argument,		0, 'h'},	// [-h?, --help]
-			{"usage",			no_argument,		0, 'U'},	// [	--usage]
+			{"usage",			no_argument,		0, 'u'},	// [	--usage]
 			{"version",			no_argument,		0, 'V'},	// [-V, --version]
 			{0, 0, 0, 0}
 		};
@@ -181,10 +161,10 @@
 		options->pid = getpid();
 
 		int opt;
-		while ((opt = getopt_long(argc, argv, "c:di:nrT:vw:W:p:qs:h?V", long_options, NULL)) != -1) {
+		while ((opt = getopt_long(argc, argv, "c:di:nrT:vw:W:p:qs:h?uV", long_options, NULL)) != -1) {
 			switch (opt) {
 				case 'c':	if (ft_strtoul(argv, optarg, &options->count, 0, true))						return (2);					break;
-				case 'L' :	if (ft_strtoul(argv, optarg, &options->ttl, 255, false))					return (2);					break;
+				case 'L':	if (ft_strtoul(argv, optarg, &options->ttl, 255, false))					return (2);					break;
 				case 'T':	if (ft_strtoul(argv, optarg, &options->tos, 255, true))						return (2);					break;
 				case 'w':	if (ft_strtoul(argv, optarg, &options->timeout, INT_MAX, false))			return (2);					break;
 				case 'W':	if (ft_strtoul(argv, optarg, &options->linger, INT_MAX, false))				return (2);					break;
@@ -194,8 +174,7 @@
 					double value = strtod(optarg, &endptr);
 					if (*endptr) {
 						fprintf(stderr, "ft_ping: invalid value (`%s' near `%s')\n", optarg, endptr);
-						fprintf(stderr, "Try 'ft_ping --help' or 'ft_ping --usage' for more information.\n");
-						return (2);
+						invalid(); return (2);
 					}
 					options->options |= OPT_INTERVAL;
 					options->interval = value * 1000;
@@ -220,15 +199,14 @@
 				case 'q':	options->options |= OPT_QUIET;																	break;
 				case '?':	if (!strcmp(argv[optind - 1], "-?"))															return (help());	return (invalid());
 				case 'h':																									return (help());
-				case 'U':																									return (usage());
+				case 'u':																									return (usage());
 				case 'V':																									return (version());
 			}
 		}
 
 		if (optind >= argc) {
 			fprintf(stderr, "ft_ping: missing host operand\n");
-			fprintf(stderr, "Try 'ft_ping --help' or 'ft_ping --usage' for more information.\n");
-			return (2);
+			invalid(); return (2);
 		}
 
 		if (validate_host(options, argv[optind])) { fprintf(stderr, "%s: unknown host\n", argv[0]); return (2); }

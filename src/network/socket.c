@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 21:25:52 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/21 21:10:09 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 13:54:39 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 
 		int optval = 6;	setsockopt(sockfd, SOL_SOCKET, SO_PRIORITY, &optval, sizeof(optval));
 		optval = 1;		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+		optval = 2;		setsockopt(sockfd, IPPROTO_IP, IP_MTU_DISCOVER, &optval, sizeof(optval));
 
 		if (options->socket_type & OPT_DEBUG)	  { int optval = 1; setsockopt(sockfd, SOL_SOCKET, SO_DEBUG,	 &optval, sizeof(optval)); }
 		if (options->socket_type & OPT_DONTROUTE) { int optval = 1; setsockopt(sockfd, SOL_SOCKET, SO_DONTROUTE, &optval, sizeof(optval)); }

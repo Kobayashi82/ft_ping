@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 12:01:02 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 14:22:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,14 +51,15 @@ void initialize(char *arg) {
 #pragma region "Main"
 
 	int main(int argc, char **argv) {
-		int				result = 0;
 		fd_set			readfds;
-		struct timeval	tv, start_time, last_send = {0, 0};
+		struct timeval	select_timeout = {(long)SELECT_TIMEOUT, (long)((SELECT_TIMEOUT - (long)SELECT_TIMEOUT) * 1000000)};
+		struct timeval	start_time = {0, 0}, last_send = {0, 0};
+		int				result = 0;
 
 		initialize(argv[0]);
-		if (parse_options(&g_ping.options, argc, argv) - 1 > 0)	return (1);
-		if (socket_create())									return (1);
-		if (packet_create())									return (1);
+		if ((result = parse_options(&g_ping.options, argc, argv)))	return (result == 2);
+		if (socket_create())										return (1);
+		if (packet_create())										return (1);
 		set_signals();
 		show_header();
 
@@ -79,26 +80,20 @@ void initialize(char *arg) {
 			size_t packet_timeout = (g_ping.options.linger) ? g_ping.options.linger : PACKET_TIMEOUT;
 			if (last_send.tv_sec && time_since_last >= packet_timeout) {
 				g_ping.data.lost++; last_send.tv_sec = 0;
-				if (g_ping.options.count && (g_ping.data.sent + g_ping.data.failed) >= g_ping.options.count) { g_ping.running = false; break; }
+				if (g_ping.options.count && g_ping.data.sent + g_ping.data.failed >= g_ping.options.count) { g_ping.running = false; break; }
 			}
 
-			if ((!g_ping.options.count || g_ping.data.sent + g_ping.data.failed < g_ping.options.count) && (!last_send.tv_sec || time_since_last >= interval_sec)) {
+			if ((!g_ping.options.count || g_ping.data.sent + g_ping.data.failed < g_ping.options.count) && time_since_last >= interval_sec) {
 				if (packet_send() == 2) { result = 1; break; }
 				last_send = now;
 			}
 
 			FD_ZERO(&readfds);
 			FD_SET(g_ping.data.sockfd, &readfds);
-			double select_timeout = 0.1;
-			tv.tv_sec = (long)select_timeout;
-			tv.tv_usec = (long)((select_timeout - tv.tv_sec) * 1000000);
-			int activity = select(g_ping.data.sockfd + 1, &readfds, NULL, NULL, &tv);
+			int activity = select(g_ping.data.sockfd + 1, &readfds, NULL, NULL, &select_timeout);
 			if (activity > 0 && FD_ISSET(g_ping.data.sockfd, &readfds)) packet_receive();
 
-			if (g_ping.options.count) {
-				size_t total_processed = g_ping.data.received + g_ping.data.lost + g_ping.data.corrupted;
-				if (total_processed >= g_ping.options.count) { g_ping.running = false; break; }
-			}
+			if (g_ping.options.count && g_ping.data.received + g_ping.data.lost + g_ping.data.corrupted >= g_ping.options.count) { g_ping.running = false; break; }
 		}
 
 		close(g_ping.data.sockfd);

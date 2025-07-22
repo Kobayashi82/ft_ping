@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 11:51:53 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 14:13:24 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,9 @@
 
 #pragma region "Defines"
 
+	#define SELECT_TIMEOUT			0.1									// 
 	#define PACKET_TIMEOUT			10									// Max seconds to wait for response
 
-	
 	#define IP_HEADER				60									// 
 	#define ICMP_HEADER				8									// 
 	#define MAX_SIZE				(65535 - IP_HEADER - ICMP_HEADER)	// 
