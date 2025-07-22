@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 21:46:47 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/21 23:06:51 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 12:01:02 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 	#include "ping.h"
 
 	#include <signal.h>
+	#include <sys/select.h>
 
 #pragma endregion
 
@@ -37,44 +38,48 @@
 
 #pragma endregion
 
+void initialize(char *arg) {
+	g_ping.name = arg;
+	g_ping.data.min_rtt = -1.0;
+	g_ping.data.max_rtt = -1.0;
+	g_ping.data.sum_rtt = 0.0;
+	g_ping.data.sum_rtt_sq = 0.0;
+	g_ping.data.rtt_count = 0;
+	g_ping.data.sockfd = -1;
+}
+
 #pragma region "Main"
 
-	int main(int argc, char **argv) {		
-		g_ping.name = argv[0];
-		g_ping.data.min_rtt = -1.0;
-		g_ping.data.max_rtt = -1.0;
-		g_ping.data.sum_rtt = 0.0;
-		g_ping.data.sum_rtt_sq = 0.0;
-		g_ping.data.rtt_count = 0;
+	int main(int argc, char **argv) {
+		int				result = 0;
+		fd_set			readfds;
+		struct timeval	tv, start_time, last_send = {0, 0};
 
-		int result = parse_options(&g_ping.options, argc, argv);
-		if (result)				return (result - 1);
-		if (socket_create())	return (1);
-		if (packet_create())	return (1);
-
+		initialize(argv[0]);
+		if (parse_options(&g_ping.options, argc, argv) - 1 > 0)	return (1);
+		if (socket_create())									return (1);
+		if (packet_create())									return (1);
 		set_signals();
 		show_header();
 
-		fd_set readfds;
-		struct timeval tv, last_send = {0, 0}, start_time;
 		gettimeofday(&start_time, NULL);
-
 		g_ping.running = true;
-		while (g_ping.running) {
-			struct timeval now; 
-			gettimeofday(&now, NULL);
-			double time_since_start = (now.tv_sec - start_time.tv_sec) + (now.tv_usec - start_time.tv_usec) / 1000000.0;
-			double time_since_last = (now.tv_sec - last_send.tv_sec) + (now.tv_usec - last_send.tv_usec) / 1000000.0;
-			double interval_sec = (g_ping.options.interval) ? g_ping.options.interval / 1000.0 : DEFAULT_INTERVAL / 1000.0;
 
-			// Check total timeout	(-w option)
+		while (g_ping.running) {
+			struct	timeval now;	gettimeofday(&now, NULL);
+
+			double	time_since_start = (now.tv_sec - start_time.tv_sec) + ((now.tv_usec - start_time.tv_usec) / 1000000.0);
+			double	time_since_last = (now.tv_sec - last_send.tv_sec) + ((now.tv_usec - last_send.tv_usec) / 1000000.0);
+			double	interval_sec = (g_ping.options.interval) ? g_ping.options.interval / 1000.0 : DEFAULT_INTERVAL / 1000.0;
+
+			// Check total timeout	(-w)
 			if (g_ping.options.timeout && time_since_start >= g_ping.options.timeout) { g_ping.running = false; break; }
 
-			// Check packet timeout	(-W option)
-			size_t packet_timeout = g_ping.options.linger ? g_ping.options.linger : MAX_WAIT;
+			// Check packet timeout	(-W)
+			size_t packet_timeout = (g_ping.options.linger) ? g_ping.options.linger : PACKET_TIMEOUT;
 			if (last_send.tv_sec && time_since_last >= packet_timeout) {
 				g_ping.data.lost++; last_send.tv_sec = 0;
-				if (g_ping.options.count && g_ping.data.sent >= g_ping.options.count) { g_ping.running = false; break; }
+				if (g_ping.options.count && (g_ping.data.sent + g_ping.data.failed) >= g_ping.options.count) { g_ping.running = false; break; }
 			}
 
 			if ((!g_ping.options.count || g_ping.data.sent + g_ping.data.failed < g_ping.options.count) && (!last_send.tv_sec || time_since_last >= interval_sec)) {

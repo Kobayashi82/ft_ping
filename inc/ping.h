@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/21 23:11:15 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 11:23:44 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,7 @@
 	#include "options.h"
 	#include "network.h"
 
-	#include <sys/select.h>
-
 #pragma endregion
-
-enum e_actions { MTX_INIT = 100, MTX_LOCK, MTX_UNLOCK, MTX_DESTROY, THRD_CREATE, THRD_JOIN, THRD_DETACH };
 
 #pragma region "Structures"
 

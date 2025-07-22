@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/21 23:03:57 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 11:51:53 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 
 #pragma region "Defines"
 
-	#define MAX_WAIT				10									// Max seconds to wait for response
+	#define PACKET_TIMEOUT			10									// Max seconds to wait for response
 
 	
 	#define IP_HEADER				60									// 
