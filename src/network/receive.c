@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 21:20:47 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 23:23:21 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,8 +90,8 @@
 				size_t data_size = data_len + 8;
 				int ttl = ip->ttl;
 
-				if (rtt >= 0) printf("%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
-				else         printf("%zd bytes from %s: icmp_seq=%d ttl=%d\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl);
+				if (rtt >= 0)	printf("%zd bytes from %s: icmp_seq=%d ttl=%d time=%.3f ms\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl, rtt);
+				else         	printf("%zd bytes from %s: icmp_seq=%d ttl=%d\n", data_size, from_str, ntohs(icmp->un.echo.sequence), ttl);
 			}
 			g_ping.data.received++;
 		} else if (icmp->type == ICMP_TIME_EXCEEDED) {
@@ -107,7 +107,7 @@
 				snprintf(host, sizeof(host), "%s", from_str);
 				if (!(g_ping.options.options & OPT_NUMERIC)) resolve_host(from_str, host);
 
-				fprintf(stderr, "%zu bytes from %s: Time to live exceeded\n", received - (ip->ihl << 2), host);
+				printf("%zu bytes from %s: Time to live exceeded\n", received - (ip->ihl << 2), host);
 
 				if (g_ping.options.options & OPT_VERBOSE) {
 					size_t icmp_payload_size = received - (ip->ihl << 2) - sizeof(struct icmphdr);

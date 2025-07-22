@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:54:09 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 20:14:33 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 23:16:51 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,7 @@ void show_icmp_info(void *icmp, size_t size) {
 
 	size_t total_icmp_size = ntohs(embedded_ip->tot_len) - (embedded_ip->ihl << 2);
 
-	fprintf(stderr, "ICMP: type %d, code %d, size %zu, id 0x%04x, seq 0x%04x\n", embedded_icmp->type, embedded_icmp->code, total_icmp_size, ntohs(embedded_icmp->un.echo.id), ntohs(embedded_icmp->un.echo.sequence));
+	printf("ICMP: type %d, code %d, size %zu, id 0x%04x, seq 0x%04x\n", embedded_icmp->type, embedded_icmp->code, total_icmp_size, ntohs(embedded_icmp->un.echo.id), ntohs(embedded_icmp->un.echo.sequence));
 }
 
 void show_ip_header(struct iphdr *ip, struct icmphdr *icmp, size_t size) {
@@ -103,9 +103,9 @@ void show_ip_header(struct iphdr *ip, struct icmphdr *icmp, size_t size) {
 			target_ip = (struct iphdr *)((char*)icmp + sizeof(struct icmphdr));
 	}
 	
-	fprintf(stderr, "IP Hdr Dump:\n ");
+	printf("IP Hdr Dump:\n ");
 	unsigned char *p = (unsigned char *)target_ip;
-	for (size_t j = 0; j < sizeof(*target_ip); j++) fprintf(stderr, "%02x%s", p[j], (j % 2) ? " " : "");
+	for (size_t j = 0; j < sizeof(*target_ip); j++) printf("%02x%s", p[j], (j % 2) ? " " : "");
 
 	char	src_str[INET_ADDRSTRLEN];
 	char	dst_str[INET_ADDRSTRLEN];
@@ -115,7 +115,7 @@ void show_ip_header(struct iphdr *ip, struct icmphdr *icmp, size_t size) {
 	inet_ntop(AF_INET, &src_addr, src_str, INET_ADDRSTRLEN);
 	inet_ntop(AF_INET, &dst_addr, dst_str, INET_ADDRSTRLEN);
 	
-	fprintf(stderr, "\nVr HL TOS  Len   ID Flg  off TTL Pro  cks      Src      Dst     Data\n");
-	fprintf(stderr, " %1x  %1x  %02x %04x %04x   %1x %04x  %02x  %02x %04x %s %s\n", target_ip->version, target_ip->ihl, target_ip->tos, ntohs(target_ip->tot_len), ntohs(target_ip->id), (ntohs(target_ip->frag_off) & 0xe000) >> 13, ntohs(target_ip->frag_off) & 0x1fff, target_ip->ttl, target_ip->protocol, ntohs(target_ip->check), src_str, dst_str);
+	printf("\nVr HL TOS  Len   ID Flg  off TTL Pro  cks      Src      Dst     Data\n");
+	printf(" %1x  %1x  %02x %04x %04x   %1x %04x  %02x  %02x %04x %s %s\n", target_ip->version, target_ip->ihl, target_ip->tos, ntohs(target_ip->tot_len), ntohs(target_ip->id), (ntohs(target_ip->frag_off) & 0xe000) >> 13, ntohs(target_ip->frag_off) & 0x1fff, target_ip->ttl, target_ip->protocol, ntohs(target_ip->check), src_str, dst_str);
 }
 
