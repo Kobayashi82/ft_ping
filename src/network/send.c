@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:37:11 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 15:11:29 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 15:35:10 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,11 @@
 			g_ping.data.failed++; return (1);
 		}
 
+		icmp->un.echo.sequence = htons(sequence++);
 		gettimeofday(&send_time, NULL);
 
 		if (g_ping.data.packet_len >= sizeof(struct icmphdr) + sizeof(struct timeval))
 			memcpy(g_ping.data.packet + sizeof(struct icmphdr), &send_time, sizeof(send_time));
-		
-		icmp->un.echo.sequence = htons(sequence++);
 
 		icmp->checksum = 0;
 		icmp->checksum = checksum(g_ping.data.packet, g_ping.data.packet_len);

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 15:15:46 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 15:34:43 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@
 
 	void packet_receive() {
 		t_options			*options = &g_ping.options;
-		char				buffer[1024];
+		char				buffer[IP_HEADER + ICMP_HEADER + MAX_SIZE];
 		struct sockaddr_in	from;
 		socklen_t			from_len = sizeof(from);
 		struct icmphdr		*icmp;
