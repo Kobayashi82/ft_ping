@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/05 21:39:40 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/22 12:05:09 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/07/22 21:46:05 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,8 +43,8 @@ NAME		= ft_ping
 # ── FLAGS ── #
 # ─────────── #
 
-CC			= gcc
-CFLAGS		= -Wall -Wextra -Werror -O2 # -march=native
+CC			= clang
+CFLAGS		= -Wall -Wextra -Werror -O2
 
 # ───────────────── #
 # ── DIRECTORIES ── #
@@ -88,7 +88,7 @@ _compile: $(OBJS)
 	@$(MAKE) -s _progress; printf "\n"
 	@$(MAKE) -s _show_cursor
 
-	sudo setcap cap_net_raw+ep $(NAME)
+# 	sudo setcap cap_net_raw+ep $(NAME)
 # 	sudo setcap cap_net_raw,cap_net_admin+ep $(NAME)
 #	sudo setcap -r $(NAME)
 
@@ -270,4 +270,13 @@ _progress:
 # ── PHONY ── #
 # ─────────── #
 
-.PHONY: all clean fclean re wipe _show_title _title _hide_cursor _show_cursor _delete_objects _progress
+docker:
+	@docker build -t ft_ping . && docker run -it --privileged --cap-add=NET_RAW --cap-add=NET_ADMIN ft_ping
+
+docker-clean:
+	@docker rm -f $$(docker ps -aq --filter "ancestor=ft_ping") 2>/dev/null || true
+	@docker rmi -f ft_ping 2>/dev/null || true
+
+docker-rebuild: docker-clean docker
+
+.PHONY: all clean fclean re wipe _show_title _title _hide_cursor _show_cursor _delete_objects _progress docker docker-clean docker-rebuild

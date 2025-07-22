@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 19:50:23 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 21:20:47 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@
 		if (getnameinfo((struct sockaddr*)&sockaddr, sizeof(sockaddr), resolved_hostname, sizeof(resolved_hostname), NULL, 0, 0) != 0) return (1);
 		freeaddrinfo(res);
 
-		if (!strcmp(resolved_hostname, hostname))	strlcpy(host, hostname, strlen(hostname));
+		if (!strcmp(resolved_hostname, hostname))	snprintf(host, sizeof(host), "%s", hostname);
 		else										snprintf(host, NI_MAXHOST + 20, "%s (%s)", resolved_hostname, hostname);
 
 		return (0);
@@ -73,7 +73,6 @@
 				g_ping.data.corrupted++; return;
 			}
 
-
 			// RTT
 			double rtt = 0.0;
 			size_t icmp_data_size = received - (ip->ihl << 2) - sizeof(struct icmphdr);
@@ -105,7 +104,7 @@
 			inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
 			if (!(g_ping.options.options & OPT_QUIET)) {
 				char host[NI_MAXHOST + 32];
-				strlcpy(host, from_str, sizeof(host));
+				snprintf(host, sizeof(host), "%s", from_str);
 				if (!(g_ping.options.options & OPT_NUMERIC)) resolve_host(from_str, host);
 
 				fprintf(stderr, "%zu bytes from %s: Time to live exceeded\n", received - (ip->ihl << 2), host);
