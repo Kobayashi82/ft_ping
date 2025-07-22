@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:54:09 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/21 23:11:42 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 15:15:49 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 		char addr_str[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &g_ping.options.sockaddr.sin_addr, addr_str, INET_ADDRSTRLEN);
 
-		size_t data_size = (g_ping.options.size) ? g_ping.options.size : DEFAULT_SIZE;
+		size_t data_size = (g_ping.options.size != SIZE_MAX) ? g_ping.options.size : DEFAULT_SIZE;
 
 		printf("PING %s (%s): %zu data bytes\n", g_ping.options.hostname, addr_str, data_size);
 		// if (g_ping.options.options & OPT_VERBOSE) printf (", id 0x%04x = %u", ping->ping_ident, ping->ping_ident);

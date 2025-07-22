@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 19:16:51 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/21 21:48:23 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 15:15:31 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@
 		icmp->un.echo.id = htons(getpid() & 0xFFFF);
 		g_ping.data.packet_len += sizeof(*icmp);
 
-		size_t data_len = (g_ping.options.size) ? g_ping.options.size : DEFAULT_SIZE;
+		size_t data_len = (g_ping.options.size != SIZE_MAX) ? g_ping.options.size : DEFAULT_SIZE;
 		if (data_len > MAX_SIZE) { fprintf(stderr, "%s: data length too large: %zu bytes\n", g_ping.name, data_len); return (1); }
 		if (data_len >= sizeof(struct timeval)) {
 			data_len -= sizeof(struct timeval);

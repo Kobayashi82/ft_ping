@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 12:01:18 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 15:15:46 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@
 			char from_str[INET_ADDRSTRLEN];
 			inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
 			if (!(options->options & OPT_QUIET)) {
-				size_t data_len = (g_ping.options.size) ? g_ping.options.size : DEFAULT_SIZE;
+				size_t data_len = (g_ping.options.size != SIZE_MAX) ? g_ping.options.size : DEFAULT_SIZE;
 				size_t data_size = data_len + 8;
 				int ttl = ip->ttl;
 
@@ -116,7 +116,7 @@
 
 			char from_str[INET_ADDRSTRLEN];
 			inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
-			size_t data_len = (g_ping.options.size) ? g_ping.options.size : DEFAULT_SIZE;
+			size_t data_len = (g_ping.options.size != SIZE_MAX) ? g_ping.options.size : DEFAULT_SIZE;
 			size_t data_size = data_len + 8;
 
 			char host[NI_MAXHOST + 32];

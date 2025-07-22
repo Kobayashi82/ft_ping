@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:45 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 14:57:03 by vzurera-         ###   ########.fr       */
+/*   Updated: 2025/07/22 15:14:01 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,7 @@
 
 	int parse_options(t_options *options, int argc, char **argv) {
 		memset(options, 0, sizeof(t_options));
+		options->size = SIZE_MAX;
 		struct option long_options[] = {
 			{"count",			required_argument,	0, 'c'},	// [-c, --count=NUM]
 			{"debug",			no_argument,		0, 'd'},	// [-d, --debug]	
