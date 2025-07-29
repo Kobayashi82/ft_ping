@@ -1,5 +1,3 @@
-# ft_ping
-
 <div align="center">
 
 ![System & Kernel](https://img.shields.io/badge/System-brown?style=for-the-badge)
@@ -7,9 +5,11 @@
 ![ICMP Protocol](https://img.shields.io/badge/Protocol-ICMP-green?style=for-the-badge)
 ![C Language](https://img.shields.io/badge/Language-C-red?style=for-the-badge)
 
-*Una reimplementación completa del comando ping clásico*
+*Una reimplementación del comando ping clásico*
 
 </div>
+
+# ft_ping
 
 ## 🎯 Descripción
 
