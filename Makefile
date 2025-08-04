@@ -198,7 +198,6 @@ fclean:
 	@if [ -f $(NAME) ]; then \
 		printf "\t$(CYAN)Deleting... $(YELLOW)library$(NC)"; \
 		rm -f $(NAME); \
-		rm -f libft_malloc$(LIB_EXT); \
 	fi
 	@printf "\r%50s\r\t$(CYAN)Deleted     $(GREEN)✓ $(YELLOW)library$(NC)\n"
 	@find $(BLD_DIR) -type d -empty -delete >/dev/null 2>&1 || true

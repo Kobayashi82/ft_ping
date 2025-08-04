@@ -46,7 +46,7 @@ El proceso básico:
 ## 🔧 Compilación
 
 ```bash
-git clone git@github.com:Kobayashi82/ft_ping.git
+git clone https://github.com/Kobayashi82/ft_ping.git
 cd ft_ping
 make
 ```
