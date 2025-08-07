@@ -6,7 +6,7 @@
 #    By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/05 21:39:40 by vzurera-          #+#    #+#              #
-#    Updated: 2025/07/22 23:02:23 by vzurera-         ###   ########.fr        #
+#    Updated: 2025/08/07 11:12:53 by vzurera-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -88,7 +88,7 @@ _compile: $(OBJS)
 	@$(MAKE) -s _progress; printf "\n"
 	@$(MAKE) -s _show_cursor
 
-	sudo setcap cap_net_raw+ep $(NAME)
+# 	sudo setcap cap_net_raw+ep $(NAME)
 # 	sudo setcap cap_net_raw,cap_net_admin+ep $(NAME)
 #	sudo setcap -r $(NAME)
 
@@ -255,7 +255,7 @@ _delete_objects:
 
 wipe:
 	@rm -rf $(BLD_DIR)
-	@rm -rf 
+	@rm -f $(NAME)
 
 # ─────────────────── #
 # ── PROGRESS LINE ── #
