@@ -192,7 +192,7 @@ Este proyecto está licenciado bajo la WTFPL – [Do What the Fuck You Want to P
 
 <div align="center">
 
-**🌐 Desarrollado como parte del curriculum de 42 School 🌐**
+**📡 Desarrollado como parte del curriculum de 42 School 📡**
 
 *"Understanding networks, one ping at a time"*
 
