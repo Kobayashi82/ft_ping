@@ -11,6 +11,10 @@
 
 # ft_ping
 
+<div align="center">
+  <img src="/ft_ping.png">
+</div>
+
 ## 🎯 Descripción
 
 **ft_ping** es una implementación desde cero del icónico comando `ping`, una herramienta fundamental en administración de redes y diagnóstico de conectividad. Este proyecto profundiza en los protocolos de red de bajo nivel, específicamente ICMP (Internet Control Message Protocol).
