@@ -14,5 +14,6 @@ doc/ft_ping\ eval.pdf
 !Makefile
 !.gitignore
 !README.md
+!README_es.md
 !LICENSE
 !ft_ping.png
