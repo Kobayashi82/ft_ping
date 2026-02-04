@@ -94,7 +94,6 @@ sudo ./ft_ping [opciones] <destino>
 | `-i`   | `--interval=NUM` | Seconds   | Waits NUM seconds between packets |
 | `-w`   | `--timeout=NUM`  | Seconds   | Stops after NUM seconds           |
 | `-W`   | `--linger=NUM`   | Seconds   | Response wait time                |
-|
 
 #### Packet configuration
 | Option | Long form           | Parameter | Description                           |
@@ -103,7 +102,6 @@ sudo ./ft_ping [opciones] <destino>
 | `-p`   | `--pattern=PATTERN` | Hex       | Fills ICMP packets with a hex pattern |
 |        | `--ttl=NUM`         | Number    | Sets NUM as Time-To-Live              |
 | `-T`   | `--tos=NUM`         | Number    | Sets Type of Service (TOS)            |
-|
 
 #### Network options
 | Option | Long form          | Description                                     |
@@ -111,14 +109,12 @@ sudo ./ft_ping [opciones] <destino>
 | `-n`   | `--numeric`        | Does not resolve hostnames in replies           |
 | `-r`   | `--ignore-routing` | Sends directly to a host on an attached network |
 | `-d`   | `--debug`          | Enables SO_DEBUG option (kernel-dependent)      |
-|
 
 #### Output and format
 | Option | Long form   | Description     |
 |--------|-------------|-----------------|
 | `-v`   | `--verbose` | Detailed output |
 | `-q`   | `--quiet`   | Quiet output    |
-|
 
 ### TOS values (Type of Service)
 
@@ -131,7 +127,6 @@ The `-T` option allows configuring the TOS field of the IP header:
 | `8`   | High Throughput      | High throughput      |
 | `136` | High Priority        | High priority        |
 | `184` | Expedited Forwarding | Expedited forwarding |
-|
 
 ## 📡 ICMP Protocol
 
@@ -156,7 +151,6 @@ typedef struct icmp_header {
 | `0`  | 0    | Echo Reply              | Expected response |
 | `3`  | *    | Destination Unreachable | Destination error |
 | `11` | 0    | Time Exceeded           | TTL expired       |
-|
 
 ### Checksum calculation
 

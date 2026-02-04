@@ -77,7 +77,6 @@ sudo ./ft_ping [opciones] <destino>
 | Opción    | Tipo          | Descripción                   | Ejemplo                 |
 |-----------|---------------|-------------------------------|-------------------------|
 | `destino` | IPv4/Hostname | Dirección IP o nombre de host | `8.8.8.8`, `google.com` |
-|
 
 #### Básicas
 | Opción     | Forma Larga | Descripción                  |
@@ -85,7 +84,6 @@ sudo ./ft_ping [opciones] <destino>
 | `-h`, `-?` | `--help`    | Muestra información de ayuda |
 | `-V`       | `--version` | Versión del programa         |
 |            | `--usage`   | Mensaje corto de uso         |
-|
 
 #### Control de Envío
 | Opción | Forma Larga      | Parámetro | Descripción                            |
@@ -94,7 +92,6 @@ sudo ./ft_ping [opciones] <destino>
 | `-i`   | `--interval=NUM` | Segundos  | Espera NUM segundos entre paquetes     |
 | `-w`   | `--timeout=NUM`  | Segundos  | Detiene después de NUM segundos        |
 | `-W`   | `--linger=NUM`   | Segundos  | Tiempo de espera para respuestas       |
-|
 
 #### Configuración de Paquetes
 | Opción | Forma Larga         | Parámetro | Descripción                                  |
@@ -103,7 +100,6 @@ sudo ./ft_ping [opciones] <destino>
 | `-p`   | `--pattern=PATTERN` | Hex       | Rellena paquetes ICMP con patrón hexadecimal |
 |        | `--ttl=NUM`         | Número    | Especifica NUM como Time-To-Live             |
 | `-T`   | `--tos=NUM`         | Número    | Establece Type of Service (TOS)              |
-|
 
 #### Opciones de Red
 | Opción | Forma Larga        | Descripción                                       |
@@ -111,14 +107,12 @@ sudo ./ft_ping [opciones] <destino>
 | `-n`   | `--numeric`        | No resuelve direcciones de host en las respuestas |
 | `-r`   | `--ignore-routing` | Envía directamente a host en red adjunta          |
 | `-d`   | `--debug`          | Activa opción SO_DEBUG (dependiente del kernel)   |
-|
 
 #### Salida y Formato
 | Opción | Forma Larga | Descripción       |
 |--------|-------------|-------------------|
 | `-v`   | `--verbose` | Salida detallada  |
 | `-q`   | `--quiet`   | Salida silenciosa |
-|
 
 ### Valores TOS (Type of Service)
 
@@ -131,7 +125,6 @@ La opción `-T` permite configurar el campo TOS del header IP:
 | `8`   | High Throughput      | Alto rendimiento   |
 | `136` | High Priority        | Alta prioridad     |
 | `184` | Expedited Forwarding | Reenvío expedito   |
-|
 
 ## 📡 Protocolo ICMP
 
@@ -156,7 +149,6 @@ typedef struct icmp_header {
 | `0`  | 0      | Echo Reply              | Respuesta esperada |
 | `3`  | *      | Destination Unreachable | Error de destino   |
 | `11` | 0      | Time Exceeded           | TTL expirado       |
-|
 
 ### Cálculo de Checksum
 
