@@ -77,7 +77,6 @@ sudo ./ft_ping [opciones] <destino>
 | Option        | Type          | Description            | Example                 |
 |---------------|---------------|------------------------|-------------------------|
 | `destination` | IPv4/Hostname | IP address or hostname | `8.8.8.8`, `google.com` |
-|
 
 #### Basic
 | Option     | Long form   | Description            |
@@ -85,7 +84,6 @@ sudo ./ft_ping [opciones] <destino>
 | `-h`, `-?` | `--help`    | Shows help information |
 | `-V`       | `--version` | Program version        |
 |            | `--usage`   | Short usage message    |
-|
 
 #### Send control
 | Option | Long form        | Parameter | Description                       |
