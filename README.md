@@ -9,17 +9,15 @@
 
 </div>
 
-# ft_ping
-
-[README en Español](README_es.md)
-
 <div align="center">
   <img src="/ft_ping.png">
 </div>
 
-## 🎯 Description
+# ft_ping
 
-**ft_ping** is a from-scratch implementation of the iconic `ping` command, a fundamental tool for network administration and connectivity diagnostics. This project dives into low-level network protocols, specifically ICMP (Internet Control Message Protocol).
+[README en Español](README_es.md)
+
+`ft_ping` is a from-scratch implementation of the iconic `ping` command, a fundamental tool for network administration and connectivity diagnostics. This project dives into low-level network protocols, specifically `ICMP` (Internet Control Message Protocol).
 
 ### What is Ping?
 
@@ -43,13 +41,13 @@ Ping is a network utility that:
 
 The basic process:
 
-1. **Packet construction**: Creates an ICMP Echo Request packet
-2. **Sending**: Transmits the packet to the specified destination
-3. **Waiting**: Waits for the ICMP Echo Reply response
-4. **Measurement**: Calculates the round-trip time (RTT)
-5. **Repeat**: Sends packets periodically until interrupted
+1. `Packet construction`: Creates an ICMP Echo Request packet
+2. `Sending`: Transmits the packet to the specified destination
+3. `Waiting`: Waits for the ICMP Echo Reply response
+4. `Measurement`: Calculates the round-trip time (RTT)
+5. `Repeat`: Sends packets periodically until interrupted
 
-## 🔧 Build
+## 🔧 Installation
 
 ```bash
 git clone https://github.com/Kobayashi82/ft_ping.git
@@ -76,57 +74,64 @@ sudo setcap cap_net_raw+ep ./ft_ping
 sudo ./ft_ping [opciones] <destino>
 ```
 
-| Option | Type | Description | Example |
-|-----------|------|-------------|---------|
+| Option        | Type          | Description            | Example                 |
+|---------------|---------------|------------------------|-------------------------|
 | `destination` | IPv4/Hostname | IP address or hostname | `8.8.8.8`, `google.com` |
+|
 
 #### Basic
-| Option | Long form | Description |
-|--------|-------------|-------------|
-| `-h`, `-?` | `--help` | Shows help information |
-| `-V` | `--version` | Program version |
-| | `--usage` | Short usage message |
+| Option     | Long form   | Description            |
+|------------|-------------|------------------------|
+| `-h`, `-?` | `--help`    | Shows help information |
+| `-V`       | `--version` | Program version        |
+|            | `--usage`   | Short usage message    |
+|
 
 #### Send control
-| Option | Long form | Parameter | Description |
-|--------|-------------|-----------|-------------|
-| `-c` | `--count=NUM` | Number | Stops after sending NUM packets |
-| `-i` | `--interval=NUM` | Seconds | Waits NUM seconds between packets |
-| `-w` | `--timeout=NUM` | Seconds | Stops after NUM seconds |
-| `-W` | `--linger=NUM` | Seconds | Response wait time |
+| Option | Long form        | Parameter | Description                       |
+|--------|------------------|-----------|-----------------------------------|
+| `-c`   | `--count=NUM`    | Number    | Stops after sending NUM packets   |
+| `-i`   | `--interval=NUM` | Seconds   | Waits NUM seconds between packets |
+| `-w`   | `--timeout=NUM`  | Seconds   | Stops after NUM seconds           |
+| `-W`   | `--linger=NUM`   | Seconds   | Response wait time                |
+|
 
 #### Packet configuration
-| Option | Long form | Parameter | Description |
-|--------|-------------|-----------|-------------|
-| `-s` | `--size=NUM` | Bytes | Sends NUM bytes of data |
-| `-p` | `--pattern=PATTERN` | Hex | Fills ICMP packets with a hex pattern |
-| | `--ttl=NUM` | Number | Sets NUM as Time-To-Live |
-| `-T` | `--tos=NUM` | Number | Sets Type of Service (TOS) |
+| Option | Long form           | Parameter | Description                           |
+|--------|---------------------|-----------|---------------------------------------|
+| `-s`   | `--size=NUM`        | Bytes     | Sends NUM bytes of data               |
+| `-p`   | `--pattern=PATTERN` | Hex       | Fills ICMP packets with a hex pattern |
+|        | `--ttl=NUM`         | Number    | Sets NUM as Time-To-Live              |
+| `-T`   | `--tos=NUM`         | Number    | Sets Type of Service (TOS)            |
+|
 
 #### Network options
-| Option | Long form | Description |
-|--------|-------------|-------------|
-| `-n` | `--numeric` | Does not resolve hostnames in replies |
-| `-r` | `--ignore-routing` | Sends directly to a host on an attached network |
-| `-d` | `--debug` | Enables SO_DEBUG option (kernel-dependent) |
+| Option | Long form          | Description                                     |
+|--------|--------------------|-------------------------------------------------|
+| `-n`   | `--numeric`        | Does not resolve hostnames in replies           |
+| `-r`   | `--ignore-routing` | Sends directly to a host on an attached network |
+| `-d`   | `--debug`          | Enables SO_DEBUG option (kernel-dependent)      |
+|
 
 #### Output and format
-| Option | Long form | Description |
-|--------|-------------|-------------|
-| `-v` | `--verbose` | Detailed output |
-| `-q` | `--quiet` | Quiet output |
+| Option | Long form   | Description     |
+|--------|-------------|-----------------|
+| `-v`   | `--verbose` | Detailed output |
+| `-q`   | `--quiet`   | Quiet output    |
+|
 
 ### TOS values (Type of Service)
 
 The `-T` option allows configuring the TOS field of the IP header:
 
-| Value | Type | Description |
-|-------|------|-------------|
-| 16 | Low Delay | Low latency |
-| 4 | High Reliability | High reliability |
-| 8 | High Throughput | High throughput |
-| 136 | High Priority | High priority |
-| 184 | Expedited Forwarding | Expedited forwarding |
+| Value | Type                 | Description          |
+|-------|----------------------|----------------------|
+| `16`  | Low Delay            | Low latency          |
+| `4`   | High Reliability     | High reliability     |
+| `8`   | High Throughput      | High throughput      |
+| `136` | High Priority        | High priority        |
+| `184` | Expedited Forwarding | Expedited forwarding |
+|
 
 ## 📡 ICMP Protocol
 
@@ -145,12 +150,13 @@ typedef struct icmp_header {
 
 ### Relevant ICMP Types
 
-| Type | Code | Description | Use in ft_ping |
-|------|--------|-------------|----------------|
-| 8 | 0 | Echo Request | Outgoing packet |
-| 0 | 0 | Echo Reply | Expected response |
-| 3 | * | Destination Unreachable | Destination error |
-| 11 | 0 | Time Exceeded | TTL expired |
+| Type | Code | Description             | Use in ft_ping    |
+|------|------|-------------------------|-------------------|
+| `8`  | 0    | Echo Request            | Outgoing packet   |
+| `0`  | 0    | Echo Reply              | Expected response |
+| `3`  | *    | Destination Unreachable | Destination error |
+| `11` | 0    | Time Exceeded           | TTL expired       |
+|
 
 ### Checksum calculation
 
@@ -158,19 +164,19 @@ The ICMP checksum is an error-detection mechanism that ensures packet integrity 
 
 #### Calculation process
 
-1. **Sum 16-bit words**: Take all bytes of the ICMP packet and group them into 16-bit words (2 bytes). Each word is added to a 32-bit accumulator.
+1. `Sum 16-bit words`: Take all bytes of the ICMP packet and group them into 16-bit words (2 bytes). Each word is added to a 32-bit accumulator.
 
-2. **Handle odd bytes**: If the packet has an odd number of bytes, the last byte is treated as the high part of a 16-bit word (shifted left by 8 bits).
+2. `Handle odd bytes`: If the packet has an odd number of bytes, the last byte is treated as the high part of a 16-bit word (shifted left by 8 bits).
 
-3. **Carry propagation**: Overflow bits (carry) beyond 16 bits are added back into the result.
+3. `Carry propagation`: Overflow bits (carry) beyond 16 bits are added back into the result.
 
-4. **One's complement**: Finally, apply the one's complement (NOT) to the 16-bit result.
+4. `One's complement`: Finally, apply the one's complement (NOT) to the 16-bit result.
 
 #### Integrity verification
 
-- **On send**: Compute checksum with the checksum field set to zero
-- **On receive**: Recompute checksum including the received value
-- **Validation**: If the packet is intact, the result should be 0xFFFF
+- `On send`: Compute checksum with the checksum field set to zero
+- `On receive`: Recompute checksum including the received value
+- `Validation`: If the packet is intact, the result should be 0xFFFF
 
 This method efficiently detects single-bit errors, byte swaps, and many multi-bit errors, which is sufficient for ICMP needs.
 
@@ -179,16 +185,16 @@ This method efficiently detects single-bit errors, byte swaps, and many multi-bi
 ### Responsible use
 
 ⚠️ **Important warnings:**
-- **Respect organizational network policies**
-- **Avoid saturating** slow connections
-- **Use appropriate intervals** in production
+- `Respect organizational network policies`
+- `Avoid saturating` slow connections
+- `Use appropriate intervals` in production
 
 ### Attack detection
 
 Some firewalls can detect:
-- **Ping floods** (many rapid packets)
-- **Anomalous packets** (odd sizes)
-- **Suspicious patterns** (irregular sequences)
+- `Ping floods` (many rapid packets)
+- `Anomalous packets` (odd sizes)
+- `Suspicious patterns` (irregular sequences)
 
 ## 📄 License
 
