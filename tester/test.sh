@@ -8,8 +8,13 @@ NC='\033[0m'
 BOLD='\033[1m'
 
 # Configuración
-FT_PING="./ft_ping"
-INETUTILS_PING="./doc/inetutils/ping"
+if [[ "$(basename "$PWD")" == "tester" ]]; then
+	FT_PING="../ft_ping"
+	INETUTILS_PING="./inetutils/ping"
+else
+	FT_PING="./ft_ping"
+	INETUTILS_PING="./tester/inetutils/ping"
+fi
 GOOD_IP="8.8.8.8"
 BAD_IP="192.0.2.1"
 GOOD_HOST="google.com"

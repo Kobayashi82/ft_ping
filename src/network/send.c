@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:37:11 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 20:27:50 by vzurera-         ###   ########.fr       */
+/*   Updated: 2026/02/09 23:35:35 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,16 @@
 #pragma region "Send"
 
 	int packet_send() {
-		static int	sequence = 0;
 		struct timeval send_time;
-
 		struct icmphdr *icmp = (struct icmphdr *)g_ping.data.packet;
 		if (g_ping.data.packet_len < sizeof(struct icmphdr)) {
 			fprintf(stderr, "%s: sending packet: packet too short: %u bytes\n", g_ping.name, g_ping.data.packet_len);
-			g_ping.data.failed++; return (1);
+			g_ping.data.failed++;
+			return (1);
 		}
 
-		icmp->un.echo.sequence = htons(sequence++);
+		uint16_t seq = g_ping.data.sequence++;
+		icmp->un.echo.sequence = htons(seq);
 		gettimeofday(&send_time, NULL);
 
 		if (g_ping.data.packet_len >= sizeof(struct icmphdr) + sizeof(struct timeval))
@@ -40,7 +40,8 @@
 
 		if (sent < 0) {
 			fprintf(stderr, "%s: sending packet: %s\n", g_ping.name, strerror(errno));
-			g_ping.data.failed++; return (1);
+			g_ping.data.failed++;
+			return (2);
 		}
 
 		if ((size_t)sent != g_ping.data.packet_len) {
@@ -49,6 +50,8 @@
 			return (0);
 		}
 
+		g_ping.data.send_times[seq % MAX_TRACKED_SEQ] = send_time;
+		g_ping.data.pending[seq % MAX_TRACKED_SEQ] = true;
 		g_ping.data.sent++;
 
 		return (0);

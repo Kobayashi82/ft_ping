@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:36:35 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 23:23:21 by vzurera-         ###   ########.fr       */
+/*   Updated: 2026/02/09 23:34:33 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 #pragma region "Resolve Host"
 
-	static int resolve_host(const char *hostname, char *host) {
+	static int resolve_host(const char *hostname, char *host, size_t host_len) {
 		struct addrinfo		hints, *res;
 		struct sockaddr_in	sockaddr;
 		char				resolved_hostname[NI_MAXHOST];
@@ -33,8 +33,8 @@
 		if (getnameinfo((struct sockaddr*)&sockaddr, sizeof(sockaddr), resolved_hostname, sizeof(resolved_hostname), NULL, 0, 0) != 0) return (1);
 		freeaddrinfo(res);
 
-		if (!strcmp(resolved_hostname, hostname))	snprintf(host, sizeof(host), "%s", hostname);
-		else										snprintf(host, NI_MAXHOST + 20, "%s (%s)", resolved_hostname, hostname);
+		if (!strcmp(resolved_hostname, hostname))	snprintf(host, host_len, "%s", hostname);
+		else								snprintf(host, host_len, "%s (%s)", resolved_hostname, hostname);
 
 		return (0);
 	}
@@ -72,6 +72,8 @@
 				if (g_ping.options.options & OPT_VERBOSE) fprintf(stderr, "%s: checksum mismatch from %s\n", g_ping.name, inet_ntoa(from.sin_addr));
 				g_ping.data.corrupted++; return;
 			}
+			size_t seq = ntohs(icmp->un.echo.sequence);
+			if (g_ping.data.pending[seq % MAX_TRACKED_SEQ]) g_ping.data.pending[seq % MAX_TRACKED_SEQ] = false;
 
 			// RTT
 			double rtt = 0.0;
@@ -100,17 +102,26 @@
 				g_ping.data.corrupted++; return;
 			}
 
+			size_t icmp_payload_size = received - (ip->ihl << 2) - sizeof(struct icmphdr);
+			if (icmp_payload_size >= sizeof(struct iphdr) + sizeof(struct icmphdr)) {
+				struct iphdr *embedded_ip = (struct iphdr *)((char*)icmp + sizeof(struct icmphdr));
+				struct icmphdr *embedded_icmp = (struct icmphdr *)((char*)embedded_ip + (embedded_ip->ihl << 2));
+				if (ntohs(embedded_icmp->un.echo.id) == (getpid() & 0xFFFF)) {
+					size_t seq = ntohs(embedded_icmp->un.echo.sequence);
+					if (g_ping.data.pending[seq % MAX_TRACKED_SEQ]) g_ping.data.pending[seq % MAX_TRACKED_SEQ] = false;
+				}
+			}
+
 			char from_str[INET_ADDRSTRLEN];
 			inet_ntop(AF_INET, &from.sin_addr, from_str, INET_ADDRSTRLEN);
 			if (!(g_ping.options.options & OPT_QUIET)) {
 				char host[NI_MAXHOST + 32];
 				snprintf(host, sizeof(host), "%s", from_str);
-				if (!(g_ping.options.options & OPT_NUMERIC)) resolve_host(from_str, host);
+				if (!(g_ping.options.options & OPT_NUMERIC)) resolve_host(from_str, host, sizeof(host));
 
 				printf("%zu bytes from %s: Time to live exceeded\n", received - (ip->ihl << 2), host);
 
 				if (g_ping.options.options & OPT_VERBOSE) {
-					size_t icmp_payload_size = received - (ip->ihl << 2) - sizeof(struct icmphdr);
 					show_ip_header(ip, icmp, icmp_payload_size);
 					show_icmp_info(icmp, icmp_payload_size);
 				}

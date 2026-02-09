@@ -15,6 +15,9 @@ doc/ft_ping\ eval.pdf
 !src
 !src/**
 
+!tester
+!tester/**
+
 !Makefile
 !.gitignore
 !README.md

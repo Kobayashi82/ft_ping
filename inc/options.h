@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 22:27:38 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 14:13:24 by vzurera-         ###   ########.fr       */
+/*   Updated: 2026/02/09 23:10:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 	#include <string.h>
 	#include <unistd.h>
 	#include <limits.h>
+	#include <stdint.h>
 	#include <getopt.h>
 	#include <stdbool.h>
 	#include <sys/time.h>
@@ -53,6 +54,7 @@
 	#define OPT_VERBOSE				0x020
 
 	#define DEFAULT_INTERVAL		1000
+	#define MAX_TRACKED_SEQ			1024
 
 #pragma endregion
 

@@ -6,7 +6,7 @@
 /*   By: vzurera- <vzurera-@student.42malaga.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 20:40:48 by vzurera-          #+#    #+#             */
-/*   Updated: 2025/07/22 12:00:53 by vzurera-         ###   ########.fr       */
+/*   Updated: 2026/02/09 23:10:06 by vzurera-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,9 @@
 		size_t			received;
 		size_t			lost;
 		size_t			corrupted;
+		uint16_t		sequence;
+		struct timeval	send_times[MAX_TRACKED_SEQ];
+		bool			pending[MAX_TRACKED_SEQ];
 		uint8_t			packet[IP_HEADER + ICMP_HEADER + MAX_SIZE];
 		uint32_t		packet_len;
 		double			min_rtt;
