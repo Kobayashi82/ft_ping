@@ -10,7 +10,7 @@
 </div>
 
 <div align="center">
-  <img src="/ft_ping.png">
+  <img src="/images/ft_ping.jpg">
 </div>
 
 # ft_ping

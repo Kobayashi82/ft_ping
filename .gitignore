@@ -9,6 +9,9 @@
 doc/ft_ping\ 5.1.pdf
 doc/ft_ping\ eval.pdf
 
+!images
+!images/**
+
 !inc
 !inc/**
 
@@ -23,4 +26,3 @@ doc/ft_ping\ eval.pdf
 !README.md
 !README_es.md
 !LICENSE
-!ft_ping.png
